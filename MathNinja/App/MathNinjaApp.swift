@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct MathNinjaApp: App {
+    @StateObject private var gameStateManager = GameStateManager()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(gameStateManager)
+                .preferredColorScheme(.dark) // Ninja theme!
         }
     }
 }
