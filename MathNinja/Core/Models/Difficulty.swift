@@ -18,22 +18,38 @@ enum Difficulty: String, CaseIterable, Identifiable {
     var description: String {
         switch self {
         case .easy:
-            return "Numbers 1-5"
-        case .medium:
             return "Numbers 1-10"
+        case .medium:
+            return "Numbers 11-20"
         case .hard:
-            return "Numbers 1-12"
+            return "Numbers 1-100"
         }
     }
     
     var maxNumber: Int {
         switch self {
-        case .easy: return 5
-        case .medium: return 10
-        case .hard: return 12
+        case .easy: return 10
+        case .medium: return 16
+        case .hard: return 100
         }
     }
     
+    var numberOfLives: Int {
+        switch self {
+        case .easy: return 5
+        case .medium: return 3
+        case .hard: return 1
+        }
+    }
+    
+    var maxLives: Int {
+        switch self {
+        case .easy: return 5
+        case .medium: return 3
+        case .hard: return 1
+        }
+    }
+
     var gameDuration: TimeInterval {
         switch self {
         case .easy: return GameConstants.Timing.easyGameDuration

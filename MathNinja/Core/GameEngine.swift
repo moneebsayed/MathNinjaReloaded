@@ -1,11 +1,3 @@
-//
-//  GameEngine.swift
-//  MathNinja
-//
-//  Created by Moneeb Sayed on 8/16/25.
-//
-
-
 import Foundation
 import GameplayKit
 import Combine
@@ -13,6 +5,8 @@ import CoreGraphics
 
 class GameEngine: ObservableObject {
     // Published properties for UI
+    @Published var lives: Int = 3
+    @Published var maxLives: Int = 3
     @Published var score: Int = 0
     @Published var timeRemaining: TimeInterval = 60
     @Published var currentProblems: [MathProblem] = []
@@ -30,7 +24,7 @@ class GameEngine: ObservableObject {
     // GameplayKit components
     private let randomSource = GKRandomSource.sharedRandom()
     
-    // Callbacks
+    // Callbacks - make these weak to prevent retain cycles
     var onGameOver: (() -> Void)?
     var onCorrectAnswer: (() -> Void)?
     var onWrongAnswer: (() -> Void)?
@@ -38,39 +32,60 @@ class GameEngine: ObservableObject {
     func startGame(difficulty: Difficulty) {
         print("🚀 Starting game with difficulty: \(difficulty)")
         
-        selectedDifficulty = difficulty
-        timeRemaining = difficulty.gameDuration
-        score = 0
-        streak = 0
-        currentProblems = []
-        totalProblemsGenerated = 0
-        isGameActive = true
-        isPaused = false
-        
-        startGameTimer()
-        startProblemGeneration()
-        
-        // Generate ONE problem in center of screen
-        let screenHeight = UIScreen.main.bounds.height
-        let screenWidth = UIScreen.main.bounds.width
-        
-        let centerPosition = CGPoint(x: screenWidth / 2, y: screenHeight / 2)
-        let problem = MathProblem(difficulty: difficulty, position: centerPosition)
-        currentProblems.append(problem)
-        totalProblemsGenerated += 1
-        
-        print("🎯 Generated initial problem: \(problem.problemText) at \(problem.position)")
-        print("✅ Game started with \(currentProblems.count) problem")
+        // Always update on main thread for @Published properties
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.selectedDifficulty = difficulty
+            self.timeRemaining = difficulty.gameDuration
+            self.lives = difficulty.numberOfLives
+            self.maxLives = difficulty.maxLives
+            self.score = 0
+            self.streak = 0
+            self.currentProblems = []
+            self.totalProblemsGenerated = 0
+            self.isGameActive = true
+            self.isPaused = false
+            
+            self.startGameTimer()
+            self.startProblemGeneration()
+            
+            // Generate ONE problem in center of screen
+            let screenHeight = UIScreen.main.bounds.height
+            let screenWidth = UIScreen.main.bounds.width
+            
+            let centerPosition = CGPoint(x: screenWidth / 2, y: screenHeight / 2)
+            let problem = MathProblem(difficulty: difficulty, position: centerPosition)
+            self.currentProblems.append(problem)
+            self.totalProblemsGenerated += 1
+            
+            print("🎯 Generated initial problem: \(problem.problemText) at \(problem.position)")
+            print("✅ Game started with \(self.currentProblems.count) problem")
+        }
     }
 
-    private func generateNewProblem() {
-        // Only generate if no problems exist
-        guard isGameActive, !isPaused, currentProblems.isEmpty else {
-            print("🚫 Cannot generate - Active: \(isGameActive), Paused: \(isPaused), Count: \(currentProblems.count)")
-            return
+    private func startProblemGeneration() {
+        // Don't use a timer - generate on demand
+        problemGenerationTimer?.invalidate()
+        problemGenerationTimer = nil
+    }
+
+    // Call this when a problem is removed
+    func removeProblem(_ problem: MathProblem) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.currentProblems.removeAll { $0.id == problem.id }
+            
+            // Generate new problem immediately when one is removed
+            if self.currentProblems.isEmpty {
+                self.generateNewProblemImmediately()
+            }
         }
+    }
+
+    private func generateNewProblemImmediately() {
+        guard isGameActive, !isPaused else { return }
         
-        // Generate in center of screen
         let screenHeight = UIScreen.main.bounds.height
         let screenWidth = UIScreen.main.bounds.width
         let centerPosition = CGPoint(x: screenWidth / 2, y: screenHeight / 2)
@@ -83,48 +98,40 @@ class GameEngine: ObservableObject {
         currentProblems.append(newProblem)
         totalProblemsGenerated += 1
         
-        print("✅ Generated new problem: \(newProblem.problemText) at center")
-        print("📝 Current problems count: \(currentProblems.count)")
+        print("✅ Generated new problem immediately: \(newProblem.problemText)")
     }
-
-    private func startProblemGeneration() {
-        // Generate new problem immediately when current one is solved
-        problemGenerationTimer?.invalidate()
         
-        // Check every second if we need a new problem
-        problemGenerationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.generateNewProblem()
-        }
-    }
-    
     func pauseGame() {
         guard isGameActive, !isPaused else { return }
         
-        isPaused = true
+        DispatchQueue.main.async { [weak self] in
+            self?.isPaused = true
+        }
         stopTimers()
     }
     
     func resumeGame() {
         guard isGameActive, isPaused else { return }
         
-        isPaused = false
+        DispatchQueue.main.async { [weak self] in
+            self?.isPaused = false
+        }
         startGameTimer()
         startProblemGeneration()
     }
     
     func endGame() {
-        isGameActive = false
-        isPaused = false
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.isGameActive = false
+            self.isPaused = false
+        }
         stopTimers()
         onGameOver?()
     }
     
     // MARK: - Problem Management
-    
-    func removeProblem(_ problem: MathProblem) {
-        currentProblems.removeAll { $0.id == problem.id }
-    }
-    
+
     func handleAnswerSelection(problem: MathProblem, selectedAnswer: Int) {
         print("🎯 Handling answer: \(selectedAnswer) for problem: \(problem.problemText)")
         
@@ -141,22 +148,38 @@ class GameEngine: ObservableObject {
     }
 
     private func handleCorrectAnswer() {
-        // Calculate score with streak multiplier
-        let basePoints = GameConstants.Scoring.correctAnswerPoints
-        let streakBonus = streak * GameConstants.Scoring.streakMultiplier
-        let timeBonus = timeRemaining > 30 ? GameConstants.Scoring.timeBonus : 0
-        
-        score += basePoints + streakBonus + timeBonus
-        streak += 1
-        
-        print("🎉 Score: +\(basePoints + streakBonus + timeBonus) (Total: \(score), Streak: \(streak))")
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Calculate score with streak multiplier
+            let basePoints = GameConstants.Scoring.correctAnswerPoints
+            let streakBonus = self.streak * GameConstants.Scoring.streakMultiplier
+            let timeBonus = self.timeRemaining > 30 ? GameConstants.Scoring.timeBonus : 0
+            
+            self.score += basePoints + streakBonus + timeBonus
+            self.streak += 1
+            
+            print("🎉 Score: +\(basePoints + streakBonus + timeBonus) (Total: \(self.score), Streak: \(self.streak))")
+        }
         
         onCorrectAnswer?()
     }
 
     private func handleWrongAnswer() {
-        streak = 0
-        print("💥 Streak reset! Score remains: \(score)")
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            defer {
+                if self.lives <= 0 {
+                    self.endGame()
+                }
+            }
+            
+            self.streak = 0
+            self.lives -= 1
+            
+            print("💥 Streak reset! Score remains: \(self.score)")
+        }
+        
         onWrongAnswer?()
     }
     
@@ -172,10 +195,12 @@ class GameEngine: ObservableObject {
             // Only decrement time if game is active AND not paused
             guard self.isGameActive && !self.isPaused else { return }
             
-            self.timeRemaining -= 1
-            
-            if self.timeRemaining <= 0 {
-                self.endGame()
+            DispatchQueue.main.async {
+                self.timeRemaining -= 1
+                
+                if self.timeRemaining <= 0 {
+                    self.endGame()
+                }
             }
         }
     }
@@ -188,6 +213,7 @@ class GameEngine: ObservableObject {
     }
     
     deinit {
+        print("🗑️ GameEngine deinit")
         stopTimers()
     }
 }

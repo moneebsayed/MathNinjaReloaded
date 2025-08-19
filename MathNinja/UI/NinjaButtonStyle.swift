@@ -16,6 +16,7 @@ struct NinjaButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .frame(maxWidth: .infinity)
             .font(.headline)
             .fontWeight(.semibold)
             .foregroundColor(.white)
@@ -28,5 +29,6 @@ struct NinjaButtonStyle: ButtonStyle {
             )
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+            .padding(.horizontal)
     }
 }

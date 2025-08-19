@@ -19,16 +19,19 @@ struct NinjaTitle: View {
     }
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack {
+            Text(title)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(Theme.textPrimary)
+
             HStack {
-                Text("🥷")
-                    .font(.system(size: 40))
+                Image("Front - Idle Blinking_001")
                     .rotationEffect(.degrees(-10))
-                
-                Text(title)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(Theme.textPrimary)
+                Spacer()
+                Image("Front - Idle Blinking_001")
+                    .rotationEffect(.degrees(10))
+
             }
             
             if let subtitle = subtitle {
@@ -37,6 +40,8 @@ struct NinjaTitle: View {
                     .foregroundColor(Theme.textSecondary)
                     .multilineTextAlignment(.center)
             }
+            
+            
         }
     }
 }

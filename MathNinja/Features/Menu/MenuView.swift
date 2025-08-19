@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+import SpriteKit
 
 struct MenuView: View {
     @EnvironmentObject var gameStateManager: GameStateManager
@@ -43,6 +44,11 @@ struct MenuView: View {
                 }
                 
                 Spacer()
+                // Chase scene at the bottom
+                SpriteView(scene: createChaseScene())
+                    .frame(height: 150)
+                    .background(Color.clear) // Make sure this is clear
+                    .allowsHitTesting(false)
                 
                 // Version info
                 Text("Version 2.0")
@@ -54,6 +60,12 @@ struct MenuView: View {
         .sheet(isPresented: $showingAbout) {
             AboutView()
         }
+    }
+    
+    private func createChaseScene() -> ChaseSlashScene {
+        let scene = ChaseSlashScene()
+        // Let the scene handle its own scale mode
+        return scene
     }
 }
 

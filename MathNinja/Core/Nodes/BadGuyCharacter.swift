@@ -49,7 +49,6 @@ class BadGuyCharacter: SKNode {
     private func setupBadGuy() {
         originalPosition = position
         addChild(badGuySprite)
-        setupEvilFeatures()
         startIdleAnimation()
     }
     

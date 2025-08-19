@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct GameHUD: View {
+    let maxLives: Int
+    let lives: Int
     let score: Int
     let timeRemaining: TimeInterval
     let streak: Int
@@ -18,11 +20,10 @@ struct GameHUD: View {
     @State private var timeWarning = false
     
     var body: some View {
-        HStack {
+        HStack(alignment: .top) {
             // Left side - Score and Streak
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading) {
                 ScoreDisplay(score: score)
-                
                 if streak > 0 {
                     StreakDisplay(streak: streak)
                 }
@@ -31,7 +32,12 @@ struct GameHUD: View {
             Spacer()
             
             // Center - Difficulty indicator
-            DifficultyBadge(difficulty: difficulty)
+            VStack {
+                DifficultyBadge(difficulty: difficulty)
+                
+                PauseButton(action: onPause)
+                    .padding()
+            }
             
             Spacer()
             
@@ -41,17 +47,11 @@ struct GameHUD: View {
                     timeRemaining: timeRemaining,
                     isWarning: timeWarning
                 )
-                
-                PauseButton(action: onPause)
+                LivesIndicator(lives: lives, maxLives: maxLives)
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 10)
-        .background(
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .ignoresSafeArea(edges: .top)
-        )
+        .padding(.vertical)
         .onChange(of: timeRemaining) { _, newTime in
             timeWarning = newTime <= 10
         }
@@ -64,15 +64,14 @@ struct StreakDisplay: View {
     let streak: Int
     
     var body: some View {
-        HStack(spacing: 4) {
+        HStack {
+            Text("\(streak)X Combo!")
+                .fontWeight(.bold)
+                .foregroundColor(Theme.dangerColor)
             Image(systemName: "flame.fill")
                 .foregroundColor(Theme.dangerColor)
-                .font(.caption2)
-            
-            Text("\(streak)x")
-                .font(.caption)
-                .fontWeight(.semibold)
-                .foregroundColor(Theme.dangerColor)
+                .fontWeight(.bold)
+
         }
         .padding(.horizontal, 6)
         .padding(.vertical, 2)
@@ -109,6 +108,8 @@ struct DifficultyBadge: View {
 
 #Preview {
     GameHUD(
+        maxLives: 5,
+        lives: 3,
         score: 1250,
         timeRemaining: 45,
         streak: 7,

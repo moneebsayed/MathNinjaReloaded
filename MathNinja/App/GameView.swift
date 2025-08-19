@@ -1,11 +1,5 @@
-//
-//  GameView.swift
-//  MathNinja
-//
-//  Created by Moneeb Sayed on 8/15/25.
-//
-
 import SwiftUI
+import Combine
 import SpriteKit
 
 struct GameView: View {
@@ -14,15 +8,14 @@ struct GameView: View {
     @State private var gameScene: GameScene?
     @State private var showingPauseMenu = false
     @State private var selectedDifficulty: Difficulty = .medium
+    @State private var cancellables = Set<AnyCancellable>()
     
     var body: some View {
         ZStack {
             if let scene = gameScene {
                 SpriteView(scene: scene)
                     .ignoresSafeArea()
-                    // Remove the red debug background
             } else {
-                // Loading placeholder
                 Color.black.ignoresSafeArea()
                 Text("Loading Game Scene...")
                     .foregroundColor(.white)
@@ -32,6 +25,8 @@ struct GameView: View {
             VStack {
                 // Top HUD
                 GameHUD(
+                    maxLives: gameEngine.maxLives,
+                    lives: gameEngine.lives,
                     score: gameEngine.score,
                     timeRemaining: gameEngine.timeRemaining,
                     streak: gameEngine.streak,
@@ -42,7 +37,6 @@ struct GameView: View {
                 
                 Spacer()
                 
-                // Replace the debug info section with:
                 if gameEngine.streak >= 3 {
                     StreakIndicator(streak: gameEngine.streak)
                         .transition(.scale.combined(with: .opacity))
@@ -55,15 +49,14 @@ struct GameView: View {
             setupGameScene()
             startGame()
             setupGameCallbacks()
+            setupPublisherSubscriptions() // Add this
         }
         .onDisappear {
             print("🎮 GameView disappeared")
+            cleanupSubscriptions() // Add this
             gameEngine.endGame()
         }
-        .onReceive(gameEngine.$currentProblems) { problems in
-            print("📡 Received \(problems.count) problems from engine")
-            gameScene?.updateProblemNodes(with: problems)
-        }
+        // REMOVE the .onReceive - we'll handle it differently
         .sheet(isPresented: $showingPauseMenu) {
             PauseMenuView(
                 score: gameEngine.score,
@@ -73,6 +66,26 @@ struct GameView: View {
                 }
             )
         }
+    }
+    
+    // Add this new method to handle subscriptions safely
+    private func setupPublisherSubscriptions() {
+        // Clear any existing subscriptions first
+        cancellables.removeAll()
+        
+        // Subscribe to currentProblems changes safely
+        gameEngine.$currentProblems
+            .receive(on: DispatchQueue.main)
+            .sink { [weak gameScene] problems in
+                print("📡 Received \(problems.count) problems from engine")
+                gameScene?.updateProblemNodes(with: problems)
+            }
+            .store(in: &cancellables)
+    }
+    
+    // Add this cleanup method
+    private func cleanupSubscriptions() {
+        cancellables.removeAll()
     }
     
     private func setupGameScene() {
@@ -114,6 +127,7 @@ struct GameView: View {
     }
     
     private func setupGameCallbacks() {
+        // Use weak references to prevent retain cycles
         gameEngine.onGameOver = { [weak gameStateManager] in
             DispatchQueue.main.async {
                 gameStateManager?.transition(to: .gameOver)
