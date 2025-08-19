@@ -5,7 +5,6 @@
 //  Created by Moneeb Sayed on 8/16/25.
 //
 
-
 import SpriteKit
 import SwiftUI
 import GameplayKit
@@ -17,6 +16,7 @@ class GameScene: SKScene {
     
     // Characters and nodes
     private var ninjaCharacter: NinjaCharacter?
+    private var badGuyCharacter: BadGuyCharacter?
     private var problemNodes: [UUID: FruitProblemNode] = [:]
     
     // Slice tracking
@@ -29,58 +29,81 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         setupScene()
         setupBackground()
-        setupNinja()
+        setupCharacters()
     }
     
     private func setupScene() {
-        backgroundColor = UIColor(red: 0.1, green: 0.2, blue: 0.4, alpha: 1.0) // Night sky
+        backgroundColor = UIColor(red: 0.1, green: 0.2, blue: 0.4, alpha: 1.0)
         scaleMode = .aspectFill
     }
     
     private func setupBackground() {
-        // Add dojo background elements
         addFloatingElements()
     }
     
-    private func setupNinja() {
-        ninjaCharacter = NinjaCharacter()
-        
-        // Position ninja in bottom left corner
+    private func setupCharacters() {
         let screenBounds = UIScreen.main.bounds
-        ninjaCharacter?.position = CGPoint(x: 80, y: 120) // Closer to edge
+        
+        // Setup Ninja (bottom left) - BIGGER and more separated
+        ninjaCharacter = NinjaCharacter()
+        let ninjaPos = CGPoint(x: 120, y: 160) // More space from edge
+        ninjaCharacter?.position = ninjaPos
+        ninjaCharacter?.setOriginalPosition(ninjaPos)
         ninjaCharacter?.zPosition = 100
         
         if let ninja = ninjaCharacter {
             addChild(ninja)
         }
         
-        // Add bad guy in top right corner
-        let badGuy = BadGuyCharacter()
-        badGuy.position = CGPoint(x: screenBounds.width - 80, y: screenBounds.height - 150)
-        badGuy.zPosition = 100
-        badGuy.name = "badGuy"
-        addChild(badGuy)
+        // Setup Bad Guy (bottom right) - BIGGER and more separated
+        badGuyCharacter = BadGuyCharacter()
+        let badGuyPos = CGPoint(x: screenBounds.width - 120, y: 160) // More space, same Y as ninja
+        badGuyCharacter?.position = badGuyPos
+        badGuyCharacter?.setOriginalPosition(badGuyPos)
+        badGuyCharacter?.zPosition = 150
+        badGuyCharacter?.name = "badGuy"
         
-        print("🥷 Ninja and 😈 Bad guy added to scene")
+        if let badGuy = badGuyCharacter {
+            addChild(badGuy)
+        }
+        
+        print("🥷 Ninja at: \(ninjaPos) and 😈 Bad guy at: \(badGuyPos)")
     }
-
+    
     private func sliceFruitNode(_ fruitNode: FruitProblemNode) {
         fruitNode.slice { [weak self] selectedAnswer in
             if let problem = fruitNode.problem {
                 let isCorrect = problem.isCorrectAnswer(selectedAnswer)
                 
-                // Both characters react
                 if isCorrect {
-                    self?.ninjaCharacter?.celebrate()
-                    // Bad guy gets angry when ninja succeeds
-                    if let badGuy = self?.childNode(withName: "badGuy") as? BadGuyCharacter {
-                        badGuy.reactToCorrectAnswer()
+                    // CORRECT: Ninja attacks bad guy
+                    if let badGuyPos = self?.badGuyCharacter?.position {
+                        // Step 1: Ninja moves and strikes
+                        self?.ninjaCharacter?.performVictoryStrike(badGuyPosition: badGuyPos) {
+                            print("🎉 Ninja victory sequence complete!")
+                        }
+                        
+                        // Step 2: Bad guy gets hurt (starts slightly after ninja begins striking)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+                            self?.badGuyCharacter?.getSlashedByNinja {
+                                print("💥 Bad guy hurt sequence complete!")
+                            }
+                        }
                     }
                 } else {
-                    self?.ninjaCharacter?.showDisappointment()
-                    // Bad guy laughs when ninja fails
-                    if let badGuy = self?.childNode(withName: "badGuy") as? BadGuyCharacter {
-                        badGuy.reactToWrongAnswer()
+                    // WRONG: Bad guy attacks ninja
+                    if let ninjaPos = self?.ninjaCharacter?.position {
+                        // Step 1: Bad guy moves and strikes
+                        self?.badGuyCharacter?.performEvilStrike(ninjaPosition: ninjaPos) {
+                            print("👹 Bad guy victory sequence complete!")
+                        }
+                        
+                        // Step 2: Ninja gets hurt (starts slightly after bad guy begins striking)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+                            self?.ninjaCharacter?.getSlashedByBadGuy {
+                                print("💥 Ninja hurt sequence complete!")
+                            }
+                        }
                     }
                 }
                 
@@ -94,10 +117,10 @@ class GameScene: SKScene {
     }
     
     private func addFloatingElements() {
-        // Add some cherry blossoms or stars floating in background
-        for _ in 0..<10 {
-            let element = SKShapeNode(circleOfRadius: 3)
-            element.fillColor = UIColor.systemPink.withAlphaComponent(0.6)
+        // Add some cherry blossoms floating in background
+        for _ in 0..<8 {
+            let element = SKShapeNode(circleOfRadius: 2)
+            element.fillColor = UIColor.systemPink.withAlphaComponent(0.4)
             element.strokeColor = .clear
             
             element.position = CGPoint(
@@ -110,8 +133,8 @@ class GameScene: SKScene {
             
             // Gentle floating animation
             let float = SKAction.sequence([
-                SKAction.moveBy(x: CGFloat.random(in: -50...50), y: 100, duration: 8.0),
-                SKAction.moveBy(x: 0, y: -frame.height - 200, duration: 0.1)
+                SKAction.moveBy(x: CGFloat.random(in: -30...30), y: 80, duration: 6.0),
+                SKAction.moveBy(x: 0, y: -frame.height - 100, duration: 0.1)
             ])
             
             element.run(SKAction.repeatForever(float))
@@ -190,9 +213,9 @@ class GameScene: SKScene {
         slicePathNode?.removeFromParent()
         slicePathNode = SKShapeNode()
         slicePathNode?.strokeColor = UIColor.systemYellow.withAlphaComponent(0.8)
-        slicePathNode?.lineWidth = 6
+        slicePathNode?.lineWidth = 4
         slicePathNode?.lineCap = .round
-        slicePathNode?.glowWidth = 4
+        slicePathNode?.glowWidth = 2
         slicePathNode?.zPosition = 50
         
         addChild(slicePathNode!)
@@ -204,19 +227,33 @@ class GameScene: SKScene {
     }
     
     private func checkSliceIntersection(at location: CGPoint) {
-        let slicedNodes = nodes(at: location).compactMap { $0.parent as? FruitProblemNode }
+        // Check for fruit slicing first
+        let slicedFruits = nodes(at: location).compactMap { $0.parent as? FruitProblemNode }
         
-        for fruitNode in slicedNodes {
+        for fruitNode in slicedFruits {
             if !fruitNode.isSliced {
                 sliceFruitNode(fruitNode)
+                return
             }
+        }
+        
+        // Check for shuriken slicing
+        let slicedShurikens = nodes(at: location).compactMap { node -> ShurikenAnswerNode? in
+            if let shuriken = node.parent as? ShurikenAnswerNode {
+                return shuriken
+            }
+            return nil
+        }
+        
+        for shurikenNode in slicedShurikens {
+            shurikenNode.handleSlice()
+            return
         }
     }
     
     private func endSlice() {
-        // Fade out slice path
         slicePathNode?.run(SKAction.sequence([
-            SKAction.fadeOut(withDuration: 0.3),
+            SKAction.fadeOut(withDuration: 0.25),
             SKAction.removeFromParent()
         ]))
         slicePathNode = nil

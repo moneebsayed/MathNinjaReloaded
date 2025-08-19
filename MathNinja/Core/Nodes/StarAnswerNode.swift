@@ -9,92 +9,123 @@
 import SpriteKit
 import SwiftUI
 
-class StarAnswerNode: SKNode {
+class ShurikenAnswerNode: SKNode {
     let answer: Int
     let isCorrect: Bool
     var onSelection: ((Int) -> Void)?
     
-    private let starShape: SKShapeNode
+    private let shurikenShape: SKShapeNode
     private let answerLabel: SKLabelNode
+    private var isSelected = false
     
     init(answer: Int, isCorrect: Bool) {
         self.answer = answer
         self.isCorrect = isCorrect
         
-        // Create star shape manually
-        let starPath = CGMutablePath()
-        let center = CGPoint.zero
-        let outerRadius: CGFloat = 30
-        let innerRadius: CGFloat = 15
-        let angleStep = CGFloat.pi / 5
+        // Create shuriken shape
+        shurikenShape = SKShapeNode(path: Self.createShurikenPath())
+        shurikenShape.fillColor = UIColor.systemGray.withAlphaComponent(0.9)
+        shurikenShape.strokeColor = UIColor.systemGray
+        shurikenShape.lineWidth = 2
         
-        for i in 0..<10 {
-            let angle = CGFloat(i) * angleStep - CGFloat.pi / 2
-            let radius = i % 2 == 0 ? outerRadius : innerRadius
-            let x = center.x + cos(angle) * radius
-            let y = center.y + sin(angle) * radius
-            
-            if i == 0 {
-                starPath.move(to: CGPoint(x: x, y: y))
-            } else {
-                starPath.addLine(to: CGPoint(x: x, y: y))
-            }
-        }
-        starPath.closeSubpath()
-        
-        starShape = SKShapeNode(path: starPath)
-        starShape.fillColor = UIColor.systemYellow
-        starShape.strokeColor = UIColor.systemOrange
-        starShape.lineWidth = 2
-        
-        // Create answer label
+        // Create answer label with strong contrast
         answerLabel = SKLabelNode(text: "\(answer)")
         answerLabel.fontName = "AvenirNext-Bold"
-        answerLabel.fontSize = 18
-        answerLabel.fontColor = UIColor.brown
+        answerLabel.fontSize = 16
+        answerLabel.fontColor = UIColor.white
         answerLabel.verticalAlignmentMode = .center
         
         super.init()
         
-        addChild(starShape)
-        addChild(answerLabel)
+        setupShuriken()
         
-        // Add glow effect
-        addGlowEffect()
-        
-        isUserInteractionEnabled = true
-        
-        print("⭐ Created star answer: \(answer)")
+        print("🌟 Created shuriken answer: \(answer)")
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func addGlowEffect() {
-        // Gentle pulsing glow
-        let glowUp = SKAction.scale(to: 1.1, duration: 1.0)
-        let glowDown = SKAction.scale(to: 1.0, duration: 1.0)
-        let glow = SKAction.sequence([glowUp, glowDown])
+    private func setupShuriken() {
+        addChild(shurikenShape)
         
-        run(SKAction.repeatForever(glow), withKey: "glow")
+        // Add black outline to text for readability
+        let outlineLabel = SKLabelNode(text: "\(answer)")
+        outlineLabel.fontName = "AvenirNext-Bold"
+        outlineLabel.fontSize = 16
+        outlineLabel.fontColor = UIColor.black
+        outlineLabel.verticalAlignmentMode = .center
+        outlineLabel.position = CGPoint(x: 1, y: -1)
+        outlineLabel.zPosition = -1
+        addChild(outlineLabel)
+        
+        addChild(answerLabel)
+        
+        // Gentle rotation animation
+        let rotate = SKAction.rotate(byAngle: .pi * 2, duration: 4.0)
+        let rotateForever = SKAction.repeatForever(rotate)
+        shurikenShape.run(rotateForever, withKey: "rotate")
+        
+        // Enable physics for swipe detection
+        let physicsBody = SKPhysicsBody(polygonFrom: Self.createShurikenPath())
+        physicsBody.isDynamic = false
+        physicsBody.categoryBitMask = 2
+        physicsBody.contactTestBitMask = 0
+        physicsBody.collisionBitMask = 0
+        self.physicsBody = physicsBody
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("⭐ Star tapped: \(answer)")
+    func handleSlice() {
+        guard !isSelected else { return }
+        isSelected = true
         
-        removeAction(forKey: "glow")
+        print("🌟 Shuriken sliced: \(answer)")
         
-        // Selection animation
-        starShape.fillColor = UIColor.systemOrange
+        // Stop rotation
+        shurikenShape.removeAction(forKey: "rotate")
         
-        let selectAnimation = SKAction.sequence([
-            SKAction.scale(to: 1.3, duration: 0.1),
-            SKAction.scale(to: 1.0, duration: 0.1)
+        // Selection animation - flash and grow
+        shurikenShape.fillColor = UIColor.systemOrange
+        shurikenShape.strokeColor = UIColor.systemRed
+        
+        let flash = SKAction.sequence([
+            SKAction.colorize(with: UIColor.systemYellow, colorBlendFactor: 0.8, duration: 0.1),
+            SKAction.colorize(with: UIColor.systemOrange, colorBlendFactor: 0.0, duration: 0.1)
         ])
         
-        run(selectAnimation) {
+        let grow = SKAction.scale(to: 1.3, duration: 0.2)
+        let shrink = SKAction.scale(to: 1.0, duration: 0.1)
+        let pulse = SKAction.sequence([grow, shrink])
+        
+        let selection = SKAction.group([flash, pulse])
+        
+        run(selection) {
             self.onSelection?(self.answer)
         }
+    }
+    
+    static func createShurikenPath() -> CGPath {
+        let path = CGMutablePath()
+        
+        // Create 4-pointed shuriken shape
+        let outerRadius: CGFloat = 25
+        let innerRadius: CGFloat = 8
+        let points = 8 // 4 main points + 4 inner points
+        
+        for i in 0..<points {
+            let angle = CGFloat(i) * .pi / 4 // 8 points around circle
+            let radius = i % 2 == 0 ? outerRadius : innerRadius
+            let x = cos(angle - .pi/2) * radius
+            let y = sin(angle - .pi/2) * radius
+            
+            if i == 0 {
+                path.move(to: CGPoint(x: x, y: y))
+            } else {
+                path.addLine(to: CGPoint(x: x, y: y))
+            }
+        }
+        
+        path.closeSubpath()
+        return path
     }
 }

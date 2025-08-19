@@ -5,7 +5,6 @@
 //  Created by Moneeb Sayed on 8/17/25.
 //
 
-
 import SpriteKit
 import SwiftUI
 
@@ -16,8 +15,9 @@ class FruitProblemNode: SKNode {
     
     private var fruitShape: SKShapeNode
     private var problemLabel: SKLabelNode
+    private var textBackground: SKShapeNode
     private var fruitType: FruitType
-    private var answerNodes: [StarAnswerNode] = []
+    private var answerNodes: [ShurikenAnswerNode] = []
     private var isShowingAnswers = false
     
     enum FruitType: CaseIterable {
@@ -66,12 +66,21 @@ class FruitProblemNode: SKNode {
         fruitShape.strokeColor = fruitType.color.withAlphaComponent(0.7)
         fruitShape.lineWidth = 3
         
+        // Create text background first
+        textBackground = SKShapeNode(rectOf: CGSize(width: 90, height: 35), cornerRadius: 8)
+        textBackground.fillColor = UIColor.white.withAlphaComponent(0.95)
+        textBackground.strokeColor = UIColor.black
+        textBackground.lineWidth = 2
+        textBackground.zPosition = 1
+        
+        // Create main label with proper contrast
         problemLabel = SKLabelNode(text: problem.problemText)
         problemLabel.fontName = "AvenirNext-Bold"
-        problemLabel.fontSize = 26 // Bigger text
-        problemLabel.fontColor = .white
+        problemLabel.fontSize = 24
+        problemLabel.fontColor = .black  // Black text on white background
         problemLabel.verticalAlignmentMode = .center
-
+        problemLabel.zPosition = 2  // Above background
+        
         super.init()
         
         setupFruit()
@@ -84,7 +93,7 @@ class FruitProblemNode: SKNode {
     }
     
     private func setupFruit() {
-        // Add shadow - FIXED: Use SKShapeNode instead of SKSpriteNode
+        // Add shadow
         let shadow: SKShapeNode
         switch fruitType {
         case .apple, .orange:
@@ -102,10 +111,11 @@ class FruitProblemNode: SKNode {
         addChild(shadow)
         
         // Add fruit shape
+        fruitShape.zPosition = 0
         addChild(fruitShape)
         
-        // Add problem text with better visibility
-        addTextOutline()
+        // Add text background and label
+        addChild(textBackground)
         addChild(problemLabel)
         
         // Add sparkle effect
@@ -134,7 +144,7 @@ class FruitProblemNode: SKNode {
         
         self.physicsBody = physicsBody
     }
-        
+    
     private func addSparkleEffect() {
         let sparkle = SKEmitterNode()
         sparkle.particleTexture = SKTexture(imageNamed: "spark")
@@ -154,6 +164,7 @@ class FruitProblemNode: SKNode {
         sparkle.particleColorSequence = nil
         sparkle.particleColor = UIColor.yellow
         sparkle.particleBlendMode = .add
+        sparkle.zPosition = 3
         
         addChild(sparkle)
     }
@@ -171,12 +182,15 @@ class FruitProblemNode: SKNode {
         // Create slice effect
         createSliceEffect()
         
-        // Split the fruit
+        // Split the fruit BUT keep the problem visible
         createFruitPieces()
         
-        // Hide original fruit
+        // Hide only the original fruit shape, KEEP the text visible
         fruitShape.alpha = 0
-        problemLabel.alpha = 0
+        // textBackground and problemLabel stay visible!
+        
+        // Enhance the text visibility for the sliced state
+        enhanceTextForSlicedState()
         
         // Show answer selection after slice animation
         let waitAction = SKAction.wait(forDuration: 0.5)
@@ -185,127 +199,122 @@ class FruitProblemNode: SKNode {
         }
         run(SKAction.sequence([waitAction, showAnswersAction]))
     }
-    
-    private func createSliceEffect() {
-        // Juice splash effect
-        let juiceSplash = SKEmitterNode()
-        juiceSplash.particleTexture = SKTexture(imageNamed: "spark")
-        juiceSplash.particleBirthRate = 200
-        juiceSplash.numParticlesToEmit = 50
-        juiceSplash.particleLifetime = 1.0
-        juiceSplash.particleSpeed = 100
-        juiceSplash.particleSpeedRange = 50
-        juiceSplash.emissionAngle = 0
-        juiceSplash.emissionAngleRange = .pi * 2
-        juiceSplash.particleScale = 0.5
-        juiceSplash.particleScaleSpeed = -0.3
-        juiceSplash.particleColor = fruitType.juiceColor
-        juiceSplash.particleAlpha = 0.8
-        juiceSplash.particleAlphaSpeed = -0.8
-        juiceSplash.particleBlendMode = .alpha
+
+    private func enhanceTextForSlicedState() {
+        // Make the text even more visible after slicing
+        textBackground.fillColor = UIColor.white.withAlphaComponent(0.98) // More opaque
+        textBackground.strokeColor = UIColor.black
+        textBackground.lineWidth = 3 // Thicker border
+        textBackground.zPosition = 15 // Much higher z-position
         
-        addChild(juiceSplash)
+        problemLabel.fontColor = .black
+        problemLabel.fontSize = 26 // Slightly bigger
+        problemLabel.zPosition = 16 // Above background
         
-        // Remove splash after effect
-        let removeAction = SKAction.sequence([
-            SKAction.wait(forDuration: 2.0),
-            SKAction.removeFromParent()
-        ])
-        juiceSplash.run(removeAction)
+        // Add a subtle glow to make it stand out more
+        let glowUp = SKAction.scale(to: 1.05, duration: 1.0)
+        let glowDown = SKAction.scale(to: 1.0, duration: 1.0)
+        let glow = SKAction.sequence([glowUp, glowDown])
+        
+        textBackground.run(SKAction.repeatForever(glow))
     }
-    
+
     private func createFruitPieces() {
-        // Create two fruit pieces that fly apart
+        // Create fruit pieces that fly apart but don't interfere with text
         for i in 0..<2 {
             let piece: SKShapeNode
             let pieceSize = CGSize(
-                width: fruitType.size.width * 0.6,
-                height: fruitType.size.height * 0.8
+                width: fruitType.size.width * 0.4,
+                height: fruitType.size.height * 0.6
             )
             
-            // Create piece shape matching original fruit
             switch fruitType {
             case .apple, .orange:
                 piece = SKShapeNode(circleOfRadius: pieceSize.width / 2)
             case .banana, .watermelon:
-                piece = SKShapeNode(rectOf: pieceSize, cornerRadius: 10)
+                piece = SKShapeNode(rectOf: pieceSize, cornerRadius: 8)
             }
             
-            piece.fillColor = fruitType.color
-            piece.strokeColor = fruitType.color.withAlphaComponent(0.7)
+            piece.fillColor = fruitType.color.withAlphaComponent(0.7)
+            piece.strokeColor = fruitType.color.withAlphaComponent(0.5)
             piece.lineWidth = 2
+            piece.zPosition = -1 // Behind the text
             
             let direction: CGFloat = i == 0 ? -1 : 1
-            piece.position = CGPoint(x: direction * 10, y: 0)
+            // Position pieces away from center to avoid covering text
+            piece.position = CGPoint(x: direction * 25, y: CGFloat.random(in: -10...10))
             
             addChild(piece)
             
             // Animate pieces flying apart
             let moveAction = SKAction.moveBy(
-                x: direction * 150,
-                y: CGFloat.random(in: -50...50),
-                duration: 1.0
+                x: direction * 180,
+                y: CGFloat.random(in: -60...60),
+                duration: 1.2
             )
-            let rotateAction = SKAction.rotate(byAngle: direction * .pi, duration: 1.0)
+            let rotateAction = SKAction.rotate(byAngle: direction * .pi * 1.5, duration: 1.2)
             let fadeAction = SKAction.fadeOut(withDuration: 1.0)
+            let shrinkAction = SKAction.scale(to: 0.2, duration: 1.2)
             
-            let pieceAnimation = SKAction.group([moveAction, rotateAction, fadeAction])
+            let pieceAnimation = SKAction.group([moveAction, rotateAction, fadeAction, shrinkAction])
             
             piece.run(pieceAnimation) {
                 piece.removeFromParent()
             }
         }
     }
-    
+
     private func showAnswerSelection(completion: @escaping (Int) -> Void) {
         guard let problem = problem, !isShowingAnswers else { return }
         isShowingAnswers = true
         
-        print("🌟 Showing star answers for: \(problem.problemText)")
+        print("🌟 Showing shuriken answers for: \(problem.problemText)")
         
         let answers = problem.allAnswers
         
-        // Position stars in a nice pattern around the sliced fruit
+        // Position shurikens around the visible equation, not covering it
         let positions = [
-            CGPoint(x: -80, y: 60),    // Top left
-            CGPoint(x: 80, y: 60),     // Top right
-            CGPoint(x: -80, y: -60),   // Bottom left
-            CGPoint(x: 80, y: -60)     // Bottom right
+            CGPoint(x: -120, y: 100),    // Top left - further out
+            CGPoint(x: 120, y: 100),     // Top right - further out
+            CGPoint(x: -120, y: -100),   // Bottom left - further out
+            CGPoint(x: 120, y: -100)     // Bottom right - further out
         ]
         
         for (index, answer) in answers.enumerated() {
-            let starNode = StarAnswerNode(
+            let shurikenNode = ShurikenAnswerNode(
                 answer: answer,
                 isCorrect: answer == problem.correctAnswer
             )
             
-            starNode.position = positions[index]
+            shurikenNode.position = positions[index]
+            shurikenNode.name = "shuriken_\(answer)"
+            shurikenNode.zPosition = 12  // Above fruit pieces but below text
             
-            starNode.onSelection = { [weak self] selectedAnswer in
+            shurikenNode.onSelection = { [weak self] selectedAnswer in
                 self?.handleAnswerSelection(selectedAnswer: selectedAnswer, completion: completion)
             }
             
-            addChild(starNode)
-            answerNodes.append(starNode)
+            addChild(shurikenNode)
+            answerNodes.append(shurikenNode)
             
             // Magical appearance animation
-            starNode.alpha = 0
-            starNode.setScale(0.1)
+            shurikenNode.alpha = 0
+            shurikenNode.setScale(0.1)
             
-            let delay = Double(index) * 0.15
+            let delay = Double(index) * 0.1
             let waitAction = SKAction.wait(forDuration: delay)
             let magicalAppear = SKAction.group([
-                SKAction.fadeIn(withDuration: 0.4),
+                SKAction.fadeIn(withDuration: 0.3),
                 SKAction.sequence([
-                    SKAction.scale(to: 1.3, duration: 0.2),
-                    SKAction.scale(to: 1.0, duration: 0.2)
+                    SKAction.scale(to: 1.2, duration: 0.15),
+                    SKAction.scale(to: 1.0, duration: 0.15)
                 ])
             ])
             
-            starNode.run(SKAction.sequence([waitAction, magicalAppear]))
+            shurikenNode.run(SKAction.sequence([waitAction, magicalAppear]))
         }
         
-        // Auto-select after 10 seconds
+        // Auto-select after 10 seconds (longer time since they need to reference the problem)
         let waitAction = SKAction.wait(forDuration: 10.0)
         let autoSelectAction = SKAction.run { [weak self] in
             if let randomAnswer = answers.randomElement() {
@@ -315,7 +324,7 @@ class FruitProblemNode: SKNode {
         
         run(SKAction.sequence([waitAction, autoSelectAction]), withKey: "autoSelect")
     }
-    
+
     private func handleAnswerSelection(selectedAnswer: Int, completion: @escaping (Int) -> Void) {
         guard let problem = problem else { return }
         
@@ -339,14 +348,14 @@ class FruitProblemNode: SKNode {
         // Call completion
         completion(selectedAnswer)
         
-        // Remove fruit node
+        // Remove the entire fruit node (including the visible equation) after a brief moment
         let finalDisappear = SKAction.group([
             SKAction.fadeOut(withDuration: 0.5),
-            SKAction.scale(to: 1.5, duration: 0.5)
+            SKAction.scale(to: 1.3, duration: 0.5)
         ])
         
         let waitAndDisappear = SKAction.sequence([
-            SKAction.wait(forDuration: 0.5),
+            SKAction.wait(forDuration: 1.0), // Give time to see the result
             finalDisappear,
             SKAction.removeFromParent()
         ])
@@ -354,31 +363,32 @@ class FruitProblemNode: SKNode {
         run(waitAndDisappear)
     }
     
-    private func addTextOutline() {
-        // Create a semi-transparent background behind text for better readability
-        let textBg = SKShapeNode(rectOf: CGSize(width: 100, height: 35), cornerRadius: 8)
-        textBg.fillColor = UIColor.black.withAlphaComponent(0.7)
-        textBg.strokeColor = UIColor.white.withAlphaComponent(0.8)
-        textBg.lineWidth = 2
-        textBg.zPosition = -0.5
-        addChild(textBg)
+    private func createSliceEffect() {
+        // More controlled juice splash effect
+        let juiceSplash = SKEmitterNode()
+        juiceSplash.particleTexture = SKTexture(imageNamed: "spark")
+        juiceSplash.particleBirthRate = 100 // Reduced
+        juiceSplash.numParticlesToEmit = 20 // Much less particles
+        juiceSplash.particleLifetime = 0.6 // Shorter
+        juiceSplash.particleSpeed = 80
+        juiceSplash.particleSpeedRange = 30
+        juiceSplash.emissionAngle = 0
+        juiceSplash.emissionAngleRange = .pi * 2
+        juiceSplash.particleScale = 0.3 // Smaller
+        juiceSplash.particleScaleSpeed = -0.4
+        juiceSplash.particleColor = fruitType.juiceColor
+        juiceSplash.particleAlpha = 0.6
+        juiceSplash.particleAlphaSpeed = -1.0
+        juiceSplash.particleBlendMode = .alpha
+        juiceSplash.zPosition = -2 // Behind everything
         
-        // Create stronger text outline effect
-        let outlineOffsets = [
-            CGPoint(x: -2, y: -2), CGPoint(x: 0, y: -2), CGPoint(x: 2, y: -2),
-            CGPoint(x: -2, y: 0),                        CGPoint(x: 2, y: 0),
-            CGPoint(x: -2, y: 2),  CGPoint(x: 0, y: 2),  CGPoint(x: 2, y: 2)
-        ]
+        addChild(juiceSplash)
         
-        for offset in outlineOffsets {
-            let outlineLabel = SKLabelNode(text: problem?.problemText ?? "")
-            outlineLabel.fontName = "AvenirNext-Bold"
-            outlineLabel.fontSize = 26 // Slightly bigger
-            outlineLabel.fontColor = .black
-            outlineLabel.verticalAlignmentMode = .center
-            outlineLabel.position = offset
-            outlineLabel.zPosition = -1
-            addChild(outlineLabel)
-        }
+        // Remove splash quickly
+        let removeAction = SKAction.sequence([
+            SKAction.wait(forDuration: 0.8),
+            SKAction.removeFromParent()
+        ])
+        juiceSplash.run(removeAction)
     }
 }
