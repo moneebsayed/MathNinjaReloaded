@@ -15,63 +15,122 @@ class GameScene: SKScene {
     // Game engine reference
     weak var gameEngine: GameEngine?
     
-    // Node management
-    private var problemNodes: [UUID: ProblemNode] = [:]
+    // Characters and nodes
+    private var ninjaCharacter: NinjaCharacter?
+    private var problemNodes: [UUID: FruitProblemNode] = [:]
+    
+    // Slice tracking
     private var slicePath: CGMutablePath?
     private var slicePathNode: SKShapeNode?
     
-    // Physics and effects
-    private var gravity: CGFloat = 300
-    
-    // Use a different name for our pause state to avoid conflict with SKScene.isPaused
+    // Game state
     private var isGamePaused: Bool = false
     
     override func didMove(to view: SKView) {
         setupScene()
-        setupPhysics()
         setupBackground()
+        setupNinja()
     }
     
     private func setupScene() {
-        backgroundColor = .clear
+        backgroundColor = UIColor(red: 0.1, green: 0.2, blue: 0.4, alpha: 1.0) // Night sky
         scaleMode = .aspectFill
     }
     
-    private func setupPhysics() {
-        physicsWorld.gravity = CGVector(dx: 0, dy: 0) // NO GRAVITY AT ALL
-        physicsWorld.contactDelegate = self
+    private func setupBackground() {
+        // Add dojo background elements
+        addFloatingElements()
+    }
+    
+    private func setupNinja() {
+        ninjaCharacter = NinjaCharacter()
+        
+        // Position ninja in bottom left corner
+        let screenBounds = UIScreen.main.bounds
+        ninjaCharacter?.position = CGPoint(x: 80, y: 120) // Closer to edge
+        ninjaCharacter?.zPosition = 100
+        
+        if let ninja = ninjaCharacter {
+            addChild(ninja)
+        }
+        
+        // Add bad guy in top right corner
+        let badGuy = BadGuyCharacter()
+        badGuy.position = CGPoint(x: screenBounds.width - 80, y: screenBounds.height - 150)
+        badGuy.zPosition = 100
+        badGuy.name = "badGuy"
+        addChild(badGuy)
+        
+        print("🥷 Ninja and 😈 Bad guy added to scene")
     }
 
-    // Also comment out the cleanup for now
-    override func update(_ currentTime: TimeInterval) {
-        super.update(currentTime)
-        
-        // Don't update anything if paused
-        guard !isGamePaused else { return }
-        
-        // DISABLE cleanup for debugging - let problems stay visible
-        /*
-        let screenHeight = UIScreen.main.bounds.height
-        
-        for (problemID, node) in problemNodes {
-            if node.position.y < -200 {
-                print("🗑️ Removing off-screen problem at Y: \(node.position.y)")
-                gameEngine?.removeProblem(gameEngine?.currentProblems.first { $0.id == problemID } ?? MathProblem(difficulty: .medium))
-                removeProblemNode(for: problemID)
+    private func sliceFruitNode(_ fruitNode: FruitProblemNode) {
+        fruitNode.slice { [weak self] selectedAnswer in
+            if let problem = fruitNode.problem {
+                let isCorrect = problem.isCorrectAnswer(selectedAnswer)
+                
+                // Both characters react
+                if isCorrect {
+                    self?.ninjaCharacter?.celebrate()
+                    // Bad guy gets angry when ninja succeeds
+                    if let badGuy = self?.childNode(withName: "badGuy") as? BadGuyCharacter {
+                        badGuy.reactToCorrectAnswer()
+                    }
+                } else {
+                    self?.ninjaCharacter?.showDisappointment()
+                    // Bad guy laughs when ninja fails
+                    if let badGuy = self?.childNode(withName: "badGuy") as? BadGuyCharacter {
+                        badGuy.reactToWrongAnswer()
+                    }
+                }
+                
+                // Handle answer in game engine
+                self?.gameEngine?.handleAnswerSelection(
+                    problem: problem,
+                    selectedAnswer: selectedAnswer
+                )
             }
-        }
-        */
-    }
-    private func setupBackground() {
-        // Add subtle particle effects for ambiance
-        if let sparkleEmitter = SKEmitterNode(fileNamed: "SparkleEffect") {
-            sparkleEmitter.position = CGPoint(x: frame.midX, y: frame.maxY)
-            sparkleEmitter.advanceSimulationTime(10)
-            addChild(sparkleEmitter)
         }
     }
     
-    // MARK: - Problem Node Management
+    private func addFloatingElements() {
+        // Add some cherry blossoms or stars floating in background
+        for _ in 0..<10 {
+            let element = SKShapeNode(circleOfRadius: 3)
+            element.fillColor = UIColor.systemPink.withAlphaComponent(0.6)
+            element.strokeColor = .clear
+            
+            element.position = CGPoint(
+                x: CGFloat.random(in: 0...frame.width),
+                y: CGFloat.random(in: 0...frame.height)
+            )
+            
+            element.zPosition = -1
+            addChild(element)
+            
+            // Gentle floating animation
+            let float = SKAction.sequence([
+                SKAction.moveBy(x: CGFloat.random(in: -50...50), y: 100, duration: 8.0),
+                SKAction.moveBy(x: 0, y: -frame.height - 200, duration: 0.1)
+            ])
+            
+            element.run(SKAction.repeatForever(float))
+        }
+    }
+    
+    // MARK: - Problem Management
+    
+    func addProblemNode(for problem: MathProblem) {
+        let fruitNode = FruitProblemNode(problem: problem)
+        fruitNode.position = problem.position
+        fruitNode.name = "problem_\(problem.id)"
+        fruitNode.zPosition = 10
+        
+        addChild(fruitNode)
+        problemNodes[problem.id] = fruitNode
+        
+        print("🍎 Added fruit problem: \(problem.problemText)")
+    }
     
     func removeProblemNode(for problemID: UUID) {
         if let node = problemNodes[problemID] {
@@ -81,56 +140,19 @@ class GameScene: SKScene {
     }
     
     func updateProblemNodes(with problems: [MathProblem]) {
-        print("🎮 GameScene updating with \(problems.count) problems")
-        
-        // Remove nodes for problems that no longer exist
         let currentProblemIDs = Set(problems.map { $0.id })
         let nodeKeys = Set(problemNodes.keys)
         
+        // Remove old nodes
         for problemID in nodeKeys.subtracting(currentProblemIDs) {
-            print("🗑️ Removing problem node: \(problemID)")
             removeProblemNode(for: problemID)
         }
         
-        // Add nodes for new problems
+        // Add new nodes
         for problem in problems {
             if problemNodes[problem.id] == nil {
-                print("➕ Adding new problem node: \(problem.problemText) at \(problem.position)")
                 addProblemNode(for: problem)
             }
-        }
-        
-        print("📊 Total nodes in scene: \(problemNodes.count)")
-    }
-    
-    func addProblemNode(for problem: MathProblem) {
-        print("🎯 Creating problem node for: \(problem.problemText)")
-        
-        let problemNode = ProblemNode(problem: problem)
-        problemNode.position = problem.position
-        problemNode.name = "problem_\(problem.id)"
-        
-        addChild(problemNode)
-        problemNodes[problem.id] = problemNode
-        
-        print("✅ Added problem node at position: \(problemNode.position)")
-        print("🌳 Scene children count: \(children.count)")
-        
-        // Apply initial physics
-        problemNode.physicsBody?.velocity = problem.velocity
-        problemNode.physicsBody?.angularVelocity = problem.rotationSpeed
-    }
-    
-    // MARK: - Pause Management
-    
-    func setGamePaused(_ paused: Bool) {
-        isGamePaused = paused
-        
-        // Pause/unpause the entire scene
-        if paused {
-            self.isPaused = true
-        } else {
-            self.isPaused = false
         }
     }
     
@@ -141,39 +163,20 @@ class GameScene: SKScene {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
         
-        print("👆 Touch began at: \(location)")
         startSlice(at: location)
+        ninjaCharacter?.performSliceAnimation()
     }
-
+    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard !isGamePaused else { return }
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
         
-        print("✋ Touch moved to: \(location)")
         continueSlice(to: location)
         checkSliceIntersection(at: location)
     }
-
-    private func checkSliceIntersection(at location: CGPoint) {
-        let slicedNodes = nodes(at: location).compactMap { $0 as? ProblemNode }
-        
-        print("🔍 Checking intersection at \(location), found \(slicedNodes.count) problem nodes")
-        
-        for problemNode in slicedNodes {
-            if !problemNode.isSliced {
-                print("✂️ Slicing problem node: \(problemNode.problem?.problemText ?? "unknown")")
-                sliceProblemNode(problemNode)
-            }
-        }
-    }
-        
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard !isGamePaused else { return }
-        endSlice()
-    }
     
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard !isGamePaused else { return }
         endSlice()
     }
@@ -186,10 +189,11 @@ class GameScene: SKScene {
         
         slicePathNode?.removeFromParent()
         slicePathNode = SKShapeNode()
-        slicePathNode?.strokeColor = .systemYellow
-        slicePathNode?.lineWidth = 4
+        slicePathNode?.strokeColor = UIColor.systemYellow.withAlphaComponent(0.8)
+        slicePathNode?.lineWidth = 6
         slicePathNode?.lineCap = .round
-        slicePathNode?.glowWidth = 2
+        slicePathNode?.glowWidth = 4
+        slicePathNode?.zPosition = 50
         
         addChild(slicePathNode!)
     }
@@ -198,28 +202,37 @@ class GameScene: SKScene {
         slicePath?.addLine(to: location)
         slicePathNode?.path = slicePath
     }
+    
+    private func checkSliceIntersection(at location: CGPoint) {
+        let slicedNodes = nodes(at: location).compactMap { $0.parent as? FruitProblemNode }
         
+        for fruitNode in slicedNodes {
+            if !fruitNode.isSliced {
+                sliceFruitNode(fruitNode)
+            }
+        }
+    }
+    
     private func endSlice() {
-        slicePathNode?.removeFromParent()
+        // Fade out slice path
+        slicePathNode?.run(SKAction.sequence([
+            SKAction.fadeOut(withDuration: 0.3),
+            SKAction.removeFromParent()
+        ]))
         slicePathNode = nil
         slicePath = nil
     }
+        
+    // MARK: - Pause Management
     
-    private func sliceProblemNode(_ problemNode: ProblemNode) {
-        problemNode.slice { [weak self] selectedAnswer in
-            // Handle answer selection
-            if let problem = problemNode.problem {
-                self?.gameEngine?.handleAnswerSelection(
-                    problem: problem,
-                    selectedAnswer: selectedAnswer
-                )
-            }
-            
-            // Remove node after animation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                problemNode.removeFromParent()
-            }
-        }
+    func setGamePaused(_ paused: Bool) {
+        isGamePaused = paused
+        self.isPaused = paused
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        super.update(currentTime)
+        // Game update logic here
     }
 }
 
