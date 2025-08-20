@@ -81,7 +81,6 @@ struct GameView: View {
                     resumeGame()
                 }
             )
-            .accessibilityIdentifier("PauseMenuSheet")
         }
     }
     

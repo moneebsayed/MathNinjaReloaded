@@ -69,9 +69,12 @@ struct GameHUD: View {
                     .accessibilityLabel("Pause Game")
                     .accessibilityHint("Pause the current game")
             }
+            .accessibilityElement(children: .contain)
         }
         .allowsHitTesting(true) // Enable touch for entire HUD
         .accessibilityIdentifier("GameHUD")
+        .accessibilityElement(children: .contain)
+        .zIndex(1000)
     }
 }
 

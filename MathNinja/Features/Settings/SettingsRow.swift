@@ -11,18 +11,18 @@ struct SettingsRow: View {
     let icon: String
     let title: String
     @Binding var isOn: Bool
-    
+
     var body: some View {
         HStack {
             Image(systemName: icon)
                 .foregroundColor(Theme.primaryColor)
                 .frame(width: 30)
-            
+
             Text(title)
                 .foregroundColor(Theme.textPrimary)
-            
+
             Spacer()
-            
+
             Toggle("", isOn: $isOn)
                 .labelsHidden()
                 .toggleStyle(SwitchToggleStyle(tint: Theme.primaryColor))

@@ -21,10 +21,17 @@ struct PauseButton: View {
                         .fill(Theme.cardBackground)
                         .stroke(Theme.primaryColor.opacity(0.3), lineWidth: 1)
                 )
+                .accessibilityIdentifier("PauseButton")
         }
-        .buttonStyle(PlainButtonStyle()) // This is crucial!
+        .buttonStyle(PlainButtonStyle())
+        .contentShape(Rectangle())                    // ✅ enlarge tappable area to the button’s frame
+        .allowsHitTesting(true)                       // ✅ ensure taps aren’t swallowed by SpriteKit
+        .zIndex(999)                                  // ✅ keep the button above the game surface
         .accessibilityIdentifier("PauseButton")
         .accessibilityLabel("Pause Game")
         .accessibilityHint("Pause the current game")
+        .accessibilityElement(children: .combine)     // ✅ make the Button itself the element
+        .accessibilityAddTraits(.isButton)
+        .accessibilityRespondsToUserInteraction(true)
     }
 }

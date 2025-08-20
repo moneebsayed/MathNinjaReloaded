@@ -8,14 +8,6 @@
 import SwiftUI
 import SpriteKit
 
-//
-//  MenuView.swift
-//  MathNinja
-//
-
-import SwiftUI
-import SpriteKit
-
 struct MenuView: View {
     @EnvironmentObject var gameStateManager: GameStateManager
     @State private var showingAbout = false
@@ -24,6 +16,7 @@ struct MenuView: View {
         ZStack {
             NinjaBackground()
 
+            // Decorative Sprite layer, stays underneath
             VStack {
                 Spacer()
                 SpriteView(scene: createChaseScene(), options: [.allowsTransparency])
@@ -32,14 +25,14 @@ struct MenuView: View {
                     .allowsHitTesting(false)
                     .background(.clear)
             }
+            .zIndex(0)
 
+            // Main content
             VStack(spacing: 40) {
                 Spacer()
                 
-                // Title
                 NinjaTitle("Math Ninja", subtitle: "Slice your way to math mastery!")
                 
-                // Main Menu Card
                 MenuCard {
                     VStack(spacing: 20) {
                         Button("Start Game") {
@@ -65,17 +58,21 @@ struct MenuView: View {
                     }
                 }
                 
-                Spacer()
-                
-                // Version info - Make sure it has the identifier
-                Text("Version 2.0")
-                    .font(.caption)
-                    .foregroundColor(Theme.textSecondary)
-                    .accessibilityIdentifier("VersionInfo")
+                Spacer(minLength: 0) // content ends here; version goes in safe-area inset below
             }
             .padding(24)
+            .zIndex(1)
         }
         .accessibilityIdentifier("MenuView")
+        // ✅ This guarantees the version label is visible & accessible on all devices
+        .safeAreaInset(edge: .bottom) {
+            Text("Version 2.0")
+                .font(.caption)
+                .foregroundColor(Theme.textSecondary)
+                .accessibilityIdentifier("VersionInfo")
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.bottom, 8)
+        }
         .sheet(isPresented: $showingAbout) {
             AboutView()
         }

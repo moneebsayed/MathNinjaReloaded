@@ -11,6 +11,10 @@ struct ContentView: View {
     @EnvironmentObject var gameStateManager: GameStateManager
     @StateObject private var gameEngine = GameEngine()
 
+    private var isUITest: Bool {
+        ProcessInfo.processInfo.environment["UITests"] == "1"
+    }
+
     var body: some View {
         Group {
             switch gameStateManager.currentState {
@@ -33,8 +37,10 @@ struct ContentView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: gameStateManager.currentState)
         .task {
-            // Authenticate Game Center on app launch
-            await gameEngine.authenticateGameCenter()
+            // ✅ Prevent Game Center or any auth popups from racing the AX tree during UI tests
+            if !isUITest {
+                await gameEngine.authenticateGameCenter()
+            }
         }
     }
 }

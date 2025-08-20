@@ -5,11 +5,6 @@
 //  Created by Moneeb Sayed on 8/15/25.
 //
 
-//
-//  SettingsView.swift
-//  MathNinja
-//
-
 import SwiftUI
 
 struct SettingsView: View {
@@ -17,11 +12,11 @@ struct SettingsView: View {
     @AppStorage("soundEnabled") private var soundEnabled = true
     @AppStorage("vibrationEnabled") private var vibrationEnabled = true
     @AppStorage("showHints") private var showHints = true
-    
+
     var body: some View {
         ZStack {
             NinjaBackground()
-            
+
             VStack(spacing: 30) {
                 // Back button
                 HStack {
@@ -34,16 +29,19 @@ struct SettingsView: View {
                         }
                         .foregroundColor(Theme.primaryColor)
                     }
+                    .buttonStyle(.plain)
                     .accessibilityIdentifier("BackButton")
                     .accessibilityElement(children: .ignore)
-                    
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityRespondsToUserInteraction(true)
+
                     Spacer()
                 }
                 .padding(.horizontal, 24)
-                
+
                 // Title
                 NinjaTitle("Settings", subtitle: "Customize your ninja experience")
-                
+
                 // Settings Card
                 MenuCard {
                     VStack(spacing: 20) {
@@ -52,32 +50,36 @@ struct SettingsView: View {
                             title: "Sound Effects",
                             isOn: $soundEnabled
                         )
-                        
+
                         Divider()
                             .background(Theme.textSecondary.opacity(0.3))
-                        
+
                         SettingsRow(
                             icon: "iphone.radiowaves.left.and.right",
                             title: "Vibration",
                             isOn: $vibrationEnabled
                         )
-                        
+
                         Divider()
                             .background(Theme.textSecondary.opacity(0.3))
-                        
+
                         SettingsRow(
                             icon: "lightbulb",
                             title: "Show Hints",
                             isOn: $showHints
                         )
                     }
+                    // ✅ Ensure rows are exposed through the card wrapper
+                    .accessibilityElement(children: .contain)
                 }
-                
+                .accessibilityIdentifier("SettingsCard")
+
                 Spacer()
             }
             .padding(24)
         }
-        .accessibilityIdentifier("SettingsView") // Move outside of ZStack
+        // ✅ Put the screen id on the visible container
+        .accessibilityIdentifier("SettingsView")
     }
 }
 

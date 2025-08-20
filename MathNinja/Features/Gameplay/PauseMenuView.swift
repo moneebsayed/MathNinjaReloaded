@@ -6,30 +6,33 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct PauseMenuView: View {
     @EnvironmentObject var gameStateManager: GameStateManager
     @Environment(\.dismiss) private var dismiss
-    
+
     let score: Int
     let timeRemaining: TimeInterval
     let onResume: () -> Void
-    
+
     var body: some View {
         ZStack {
-            // Semi-transparent background
+            // Semi-transparent background (keep out of AX)
             Color.black.opacity(0.7)
                 .ignoresSafeArea()
-                .accessibilityIdentifier("PauseMenuBackground")
-            
-            // Pause menu content
+                .accessibilityHidden(true)
+
+            // ===== Visible modal content =====
             VStack(spacing: 24) {
                 // Title
                 VStack(spacing: 8) {
                     Text("⏸️")
                         .font(.system(size: 50))
                         .accessibilityIdentifier("PauseEmoji")
-                    
+
                     Text("Game Paused")
                         .font(.title)
                         .fontWeight(.bold)
@@ -37,7 +40,7 @@ struct PauseMenuView: View {
                         .accessibilityIdentifier("PauseTitle")
                 }
                 .accessibilityIdentifier("PauseHeader")
-                
+
                 // Current stats
                 MenuCard {
                     VStack(spacing: 16) {
@@ -48,7 +51,7 @@ struct PauseMenuView: View {
                     }
                 }
                 .accessibilityIdentifier("PauseStatsCard")
-                
+
                 // Menu options
                 VStack(spacing: 16) {
                     Button("Resume Game") {
@@ -59,7 +62,7 @@ struct PauseMenuView: View {
                     .accessibilityIdentifier("ResumeButton")
                     .accessibilityLabel("Resume Game")
                     .accessibilityHint("Continue playing the current game")
-                    
+
                     Button("Main Menu") {
                         dismiss()
                         gameStateManager.transition(to: .menu)
@@ -72,11 +75,23 @@ struct PauseMenuView: View {
                 .accessibilityIdentifier("PauseMenuButtons")
             }
             .padding(24)
+
+            // ✅ Make THIS container the modal AX element with the ID your test expects
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("PauseMenuView")
+            .accessibilityAddTraits(.isModal)
+            .accessibilityRespondsToUserInteraction(true)
+            .accessibilitySortPriority(1000)
+            .onAppear {
+                // Force AX tree update so XCTest "sees" it immediately
+                #if canImport(UIKit)
+                UIAccessibility.post(notification: .screenChanged, argument: nil)
+                #endif
+            }
         }
-        .accessibilityIdentifier("PauseMenuView")
         .interactiveDismissDisabled() // Prevent accidental dismissal
     }
-    
+
     private func formatTime(_ time: TimeInterval) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
