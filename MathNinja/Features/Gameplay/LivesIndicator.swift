@@ -5,7 +5,6 @@
 //  Created by Moneeb Sayed on 8/19/25.
 //
 
-
 import SwiftUI
 
 struct LivesIndicator: View {
@@ -23,6 +22,8 @@ struct LivesIndicator: View {
                         index == lives && lives >= 0 ? 1.2 : 1.0
                     )
                     .animation(.bouncy(duration: 0.4), value: lives)
+                    .accessibilityIdentifier("Heart\(index)")
+                    .accessibilityLabel(index < lives ? "Full heart" : "Empty heart")
             }
         }
         .padding(.horizontal, 12)
@@ -31,6 +32,10 @@ struct LivesIndicator: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(.ultraThinMaterial)
         )
+        .accessibilityIdentifier("LivesIndicator")
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(lives) out of \(maxLives) lives remaining")
+        .accessibilityValue("\(lives) lives")
     }
 }
 

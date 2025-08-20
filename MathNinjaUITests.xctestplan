@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "DD04DEB4-02B2-4100-9A73-C6493E1669CC",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:MathNinja.xcodeproj",
+        "identifier" : "A97A368D2E4F8DE0002739A1",
+        "name" : "MathNinjaUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

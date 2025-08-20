@@ -32,11 +32,13 @@ struct GameOverView: View {
                 VStack(spacing: 12) {
                     Text(gameEngine.lives <= 0 ? "💀" : "⏰")
                         .font(.system(size: 60))
+                        .accessibilityIdentifier("GameOverEmoji")
                     
                     Text(gameEngine.lives <= 0 ? "Game Over!" : "Time's Up!")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(Theme.textPrimary)
+                        .accessibilityIdentifier("GameOverTitle")
                     
                     if isNewHighScore {
                         Text("🎉 NEW HIGH SCORE! 🎉")
@@ -45,8 +47,10 @@ struct GameOverView: View {
                             .foregroundColor(Theme.secondaryColor)
                             .scaleEffect(1.1)
                             .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: isNewHighScore)
+                            .accessibilityIdentifier("NewHighScoreText")
                     }
                 }
+                .accessibilityIdentifier("GameOverHeader")
                 
                 // Final Stats
                 MenuCard {
@@ -57,11 +61,13 @@ struct GameOverView: View {
                                 Text("Final Score")
                                     .font(.headline)
                                     .foregroundColor(Theme.textPrimary)
+                                    .accessibilityIdentifier("FinalScoreLabel")
                                 
                                 Text("\(finalScore)")
                                     .font(.title)
                                     .fontWeight(.bold)
                                     .foregroundColor(Theme.primaryColor)
+                                    .accessibilityIdentifier("FinalScoreValue")
                             }
                             
                             Spacer()
@@ -70,8 +76,10 @@ struct GameOverView: View {
                                 Image(systemName: "crown.fill")
                                     .font(.title2)
                                     .foregroundColor(Theme.secondaryColor)
+                                    .accessibilityIdentifier("HighScoreCrown")
                             }
                         }
+                        .accessibilityIdentifier("FinalScoreSection")
                         
                         Divider()
                             .background(Theme.textSecondary.opacity(0.3))
@@ -82,10 +90,15 @@ struct GameOverView: View {
                             GridItem(.flexible())
                         ], spacing: 16) {
                             StatCard(title: "Problems", value: "\(problemsSolved)", icon: "checkmark.circle")
+                                .accessibilityIdentifier("ProblemsStatCard")
                             StatCard(title: "Accuracy", value: "\(accuracy)%", icon: "target")
+                                .accessibilityIdentifier("AccuracyStatCard")
                             StatCard(title: "Best Streak", value: "\(maxStreak)", icon: "flame")
+                                .accessibilityIdentifier("StreakStatCard")
                             StatCard(title: "High Score", value: "\(highScore)", icon: "star")
+                                .accessibilityIdentifier("HighScoreStatCard")
                         }
+                        .accessibilityIdentifier("DetailedStatsGrid")
                         
                         // Additional game info
                         LazyVGrid(columns: [
@@ -93,13 +106,18 @@ struct GameOverView: View {
                             GridItem(.flexible())
                         ], spacing: 16) {
                             StatCard(title: "Time Played", value: formatTime(gameTimeElapsed), icon: "clock")
+                                .accessibilityIdentifier("TimePlayedStatCard")
                             StatCard(title: "Difficulty", value: gameEngine.selectedDifficulty.rawValue, icon: "chart.bar")
+                                .accessibilityIdentifier("DifficultyStatCard")
                         }
+                        .accessibilityIdentifier("GameInfoGrid")
                     }
                 }
+                .accessibilityIdentifier("StatsCard")
                 
                 // Performance message
                 performanceMessageView
+                    .accessibilityIdentifier("PerformanceMessage")
                 
                 // Action buttons
                 VStack(spacing: 16) {
@@ -107,24 +125,36 @@ struct GameOverView: View {
                         gameStateManager.transition(to: .difficultySelection)
                     }
                     .buttonStyle(NinjaButtonStyle())
+                    .accessibilityIdentifier("PlayAgainButton")
+                    .accessibilityLabel("Play Again")
+                    .accessibilityHint("Start a new game")
                     
                     HStack(spacing: 16) {
                         Button("Main Menu") {
                             gameStateManager.transition(to: .menu)
                         }
                         .buttonStyle(NinjaButtonStyle(isSecondary: true))
+                        .accessibilityIdentifier("MainMenuButton")
+                        .accessibilityLabel("Main Menu")
+                        .accessibilityHint("Return to main menu")
                         
                         Button("Share Score") {
                             shareScore()
                         }
                         .buttonStyle(NinjaButtonStyle(isSecondary: true))
+                        .accessibilityIdentifier("ShareScoreButton")
+                        .accessibilityLabel("Share Score")
+                        .accessibilityHint("Share your score with others")
                     }
+                    .accessibilityIdentifier("ActionButtonsRow")
                 }
+                .accessibilityIdentifier("ActionButtons")
                 
                 Spacer()
             }
             .padding(24)
         }
+        .accessibilityIdentifier("GameOverView")
         .onAppear {
             loadGameStatistics()
             checkForNewHighScore()
@@ -138,13 +168,16 @@ struct GameOverView: View {
         VStack(spacing: 8) {
             Text(performanceEmoji)
                 .font(.title2)
+                .accessibilityIdentifier("PerformanceEmoji")
             
             Text(performanceMessage)
                 .font(.subheadline)
                 .foregroundColor(Theme.textSecondary)
                 .multilineTextAlignment(.center)
+                .accessibilityIdentifier("PerformanceText")
         }
         .padding(.horizontal)
+        .accessibilityElement(children: .combine)
     }
     
     private var performanceEmoji: String {
@@ -170,6 +203,7 @@ struct GameOverView: View {
     }
     
     // MARK: - Data Loading & Processing
+    // [Rest of the methods remain the same as they don't need accessibility changes]
     
     private func loadGameStatistics() {
         // Get final score from game engine

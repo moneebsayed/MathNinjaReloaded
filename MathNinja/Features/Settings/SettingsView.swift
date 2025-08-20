@@ -5,6 +5,11 @@
 //  Created by Moneeb Sayed on 8/15/25.
 //
 
+//
+//  SettingsView.swift
+//  MathNinja
+//
+
 import SwiftUI
 
 struct SettingsView: View {
@@ -29,6 +34,9 @@ struct SettingsView: View {
                         }
                         .foregroundColor(Theme.primaryColor)
                     }
+                    .accessibilityIdentifier("BackButton")
+                    .accessibilityElement(children: .ignore)
+                    
                     Spacer()
                 }
                 .padding(.horizontal, 24)
@@ -69,6 +77,7 @@ struct SettingsView: View {
             }
             .padding(24)
         }
+        .accessibilityIdentifier("SettingsView") // Move outside of ZStack
     }
 }
 

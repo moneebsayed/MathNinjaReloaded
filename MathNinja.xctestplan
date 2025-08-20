@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "98E9964B-397C-407A-9344-455D6A6ADCDE",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:MathNinja.xcodeproj",
+      "identifier" : "A97A36762E4F8DDF002739A1",
+      "name" : "MathNinja"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:MathNinja.xcodeproj",
+        "identifier" : "A97A36832E4F8DDF002739A1",
+        "name" : "MathNinjaTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:MathNinja.xcodeproj",
+        "identifier" : "A97A368D2E4F8DE0002739A1",
+        "name" : "MathNinjaUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

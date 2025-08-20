@@ -8,6 +8,14 @@
 import SwiftUI
 import SpriteKit
 
+//
+//  MenuView.swift
+//  MathNinja
+//
+
+import SwiftUI
+import SpriteKit
+
 struct MenuView: View {
     @EnvironmentObject var gameStateManager: GameStateManager
     @State private var showingAbout = false
@@ -38,27 +46,36 @@ struct MenuView: View {
                             gameStateManager.transition(to: .difficultySelection)
                         }
                         .buttonStyle(NinjaButtonStyle())
+                        .accessibilityIdentifier("StartGame")
+                        .accessibilityElement(children: .ignore)
                         
                         Button("Settings") {
                             gameStateManager.transition(to: .settings)
                         }
                         .buttonStyle(NinjaButtonStyle(isSecondary: true))
+                        .accessibilityIdentifier("Settings")
+                        .accessibilityElement(children: .ignore)
                         
                         Button("About") {
                             showingAbout = true
                         }
                         .buttonStyle(NinjaButtonStyle(isSecondary: true))
+                        .accessibilityIdentifier("About")
+                        .accessibilityElement(children: .ignore)
                     }
                 }
                 
                 Spacer()
-                // Version info
+                
+                // Version info - Make sure it has the identifier
                 Text("Version 2.0")
                     .font(.caption)
                     .foregroundColor(Theme.textSecondary)
+                    .accessibilityIdentifier("VersionInfo")
             }
             .padding(24)
         }
+        .accessibilityIdentifier("MenuView")
         .sheet(isPresented: $showingAbout) {
             AboutView()
         }

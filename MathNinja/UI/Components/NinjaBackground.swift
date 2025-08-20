@@ -19,13 +19,18 @@ struct NinjaBackground: View {
             // Base environment gradient
             backgroundEnvironment
                 .ignoresSafeArea()
+                .accessibilityIdentifier("BackgroundEnvironment")
             
             // Environmental elements
             environmentalElements
+                .accessibilityIdentifier("EnvironmentalElements")
             
             // Floating particles/energy
             floatingParticles
+                .accessibilityIdentifier("FloatingParticles")
         }
+        .accessibilityIdentifier("NinjaBackground")
+        .accessibilityHidden(true) // Hide decorative background from screen readers
         .onAppear {
             startAnimations()
         }
@@ -36,12 +41,15 @@ struct NinjaBackground: View {
         ZStack {
             // Primary background
             Theme.dojoGradient
+                .accessibilityHidden(true)
             
             // Mountain silhouettes (background layer)
             if colorScheme == .light {
                 lightModeEnvironment
+                    .accessibilityHidden(true)
             } else {
                 darkModeEnvironment
+                    .accessibilityHidden(true)
             }
         }
     }
@@ -60,6 +68,7 @@ struct NinjaBackground: View {
                 }
                 .padding(.bottom, 50)
             }
+            .accessibilityHidden(true)
             
             // Paper doors/windows effect
             HStack {
@@ -72,6 +81,7 @@ struct NinjaBackground: View {
                     .frame(width: 3)
             }
             .padding(.horizontal, 30)
+            .accessibilityHidden(true)
         }
     }
     
@@ -90,6 +100,7 @@ struct NinjaBackground: View {
                         path.addLine(to: CGPoint(x: 0, y: 180))
                     }
                     .fill(Color.black.opacity(0.3))
+                    .accessibilityHidden(true)
                     
                     Spacer()
                     
@@ -101,15 +112,18 @@ struct NinjaBackground: View {
                         path.addLine(to: CGPoint(x: 0, y: 160))
                     }
                     .fill(Color.black.opacity(0.2))
+                    .accessibilityHidden(true)
                 }
                 .frame(height: 200)
             }
             
             // Clouds
             cloudsLayer
+                .accessibilityHidden(true)
             
             // Stars
             starsLayer
+                .accessibilityHidden(true)
         }
     }
     
@@ -120,6 +134,7 @@ struct NinjaBackground: View {
             if colorScheme == .dark {
                 cloudsLayer
                     .opacity(0.6)
+                    .accessibilityHidden(true)
             }
             
             // Mist/fog effect
@@ -134,6 +149,7 @@ struct NinjaBackground: View {
                         .repeatForever(autoreverses: true),
                         value: animateElements
                     )
+                    .accessibilityHidden(true)
             }
         }
     }
@@ -151,6 +167,7 @@ struct NinjaBackground: View {
                         .repeatForever(autoreverses: false),
                         value: cloudOffset
                     )
+                    .accessibilityHidden(true)
             }
         }
         .onAppear {
@@ -173,6 +190,7 @@ struct NinjaBackground: View {
                     .repeatForever(autoreverses: true),
                     value: starsOpacity
                 )
+                .accessibilityHidden(true)
         }
     }
     
@@ -192,6 +210,7 @@ struct NinjaBackground: View {
                     .repeatForever(autoreverses: true),
                     value: animateElements
                 )
+                .accessibilityHidden(true)
         }
     }
     

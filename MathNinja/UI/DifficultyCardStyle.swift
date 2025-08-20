@@ -26,6 +26,7 @@ struct DifficultyCardStyle: ButtonStyle {
             )
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+            .accessibilityAddTraits(.isButton)
     }
     
     private func colorForDifficulty(_ difficulty: Difficulty) -> Color {

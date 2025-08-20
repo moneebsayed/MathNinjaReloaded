@@ -5,7 +5,6 @@
 //  Created by Moneeb Sayed on 8/16/25.
 //
 
-
 import SwiftUI
 
 struct ScoreDisplay: View {
@@ -17,6 +16,7 @@ struct ScoreDisplay: View {
             Image(systemName: "star.fill")
                 .foregroundColor(Theme.secondaryColor)
                 .font(.caption)
+                .accessibilityIdentifier("ScoreIcon")
             
             Text("\(score)")
                 .font(.headline)
@@ -24,6 +24,7 @@ struct ScoreDisplay: View {
                 .foregroundColor(Theme.textPrimary)
                 .contentTransition(.numericText(value: Double(score)))
                 .animation(.easeInOut(duration: 0.3), value: score)
+                .accessibilityIdentifier("ScoreValue")
         }
         .scaleEffect(score != previousScore ? 1.2 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: score)
@@ -35,5 +36,9 @@ struct ScoreDisplay: View {
                 previousScore = newValue
             }
         }
+        .accessibilityIdentifier("ScoreDisplay")
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Current score: \(score) points")
+        .accessibilityValue("\(score)")
     }
 }

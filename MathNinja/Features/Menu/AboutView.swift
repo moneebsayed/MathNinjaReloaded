@@ -40,9 +40,12 @@ struct AboutView: View {
                         dismiss()
                     }
                     .foregroundColor(Theme.primaryColor)
+                    .accessibilityIdentifier("DoneButton")
+                    .accessibilityElement(children: .ignore)
                 }
             }
         }
         .presentationDetents([.medium])
+        .accessibilityIdentifier("AboutView")
     }
 }

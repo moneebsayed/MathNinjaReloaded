@@ -28,23 +28,34 @@ struct NinjaTitle: View {
                     color: colorScheme == .dark ? Color.black.opacity(0.8) : Color.clear,
                     radius: colorScheme == .dark ? 2 : 0
                 )
+                .accessibilityIdentifier("TitleText")
+                .accessibilityAddTraits(.isHeader)
 
             HStack {
                 Image("Front - Idle Blinking_001")
                     .rotationEffect(.degrees(-10))
                     .opacity(colorScheme == .dark ? 0.9 : 1.0)
+                    .accessibilityIdentifier("LeftNinjaImage")
+                    .accessibilityHidden(true) // Decorative images
                 Spacer()
                 Image("Front - Idle Blinking_001")
                     .rotationEffect(.degrees(10))
                     .opacity(colorScheme == .dark ? 0.9 : 1.0)
+                    .accessibilityIdentifier("RightNinjaImage")
+                    .accessibilityHidden(true) // Decorative images
             }
+            .accessibilityIdentifier("NinjaImages")
             
             if let subtitle = subtitle {
                 Text(subtitle)
                     .font(.subheadline)
                     .foregroundColor(Theme.textSecondary)
                     .multilineTextAlignment(.center)
+                    .accessibilityIdentifier("SubtitleText")
             }
         }
+        .accessibilityIdentifier("NinjaTitle")
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(subtitle != nil ? "\(title). \(subtitle!)" : title)
     }
 }

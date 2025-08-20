@@ -32,5 +32,6 @@ struct MenuCard<Content: View>: View {
                     y: colorScheme == .dark ? 4 : 2
                 )
         )
+        .accessibilityElement(children: .contain) // Allow child elements to be accessible
     }
 }

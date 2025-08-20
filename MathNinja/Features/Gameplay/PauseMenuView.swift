@@ -5,7 +5,6 @@
 //  Created by Moneeb Sayed on 8/16/25.
 //
 
-
 import SwiftUI
 
 struct PauseMenuView: View {
@@ -21,6 +20,7 @@ struct PauseMenuView: View {
             // Semi-transparent background
             Color.black.opacity(0.7)
                 .ignoresSafeArea()
+                .accessibilityIdentifier("PauseMenuBackground")
             
             // Pause menu content
             VStack(spacing: 24) {
@@ -28,20 +28,26 @@ struct PauseMenuView: View {
                 VStack(spacing: 8) {
                     Text("⏸️")
                         .font(.system(size: 50))
+                        .accessibilityIdentifier("PauseEmoji")
                     
                     Text("Game Paused")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(Theme.textPrimary)
+                        .accessibilityIdentifier("PauseTitle")
                 }
+                .accessibilityIdentifier("PauseHeader")
                 
                 // Current stats
                 MenuCard {
                     VStack(spacing: 16) {
                         StatRow(label: "Current Score", value: "\(score)")
+                            .accessibilityIdentifier("CurrentScoreRow")
                         StatRow(label: "Time Remaining", value: formatTime(timeRemaining))
+                            .accessibilityIdentifier("TimeRemainingRow")
                     }
                 }
+                .accessibilityIdentifier("PauseStatsCard")
                 
                 // Menu options
                 VStack(spacing: 16) {
@@ -50,16 +56,24 @@ struct PauseMenuView: View {
                         onResume()
                     }
                     .buttonStyle(NinjaButtonStyle())
+                    .accessibilityIdentifier("ResumeButton")
+                    .accessibilityLabel("Resume Game")
+                    .accessibilityHint("Continue playing the current game")
                     
                     Button("Main Menu") {
                         dismiss()
                         gameStateManager.transition(to: .menu)
                     }
                     .buttonStyle(NinjaButtonStyle(isSecondary: true))
+                    .accessibilityIdentifier("MainMenuButton")
+                    .accessibilityLabel("Main Menu")
+                    .accessibilityHint("Return to the main menu and end current game")
                 }
+                .accessibilityIdentifier("PauseMenuButtons")
             }
             .padding(24)
         }
+        .accessibilityIdentifier("PauseMenuView")
         .interactiveDismissDisabled() // Prevent accidental dismissal
     }
     

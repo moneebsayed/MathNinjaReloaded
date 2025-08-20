@@ -44,6 +44,7 @@ struct DifficultyCard: View {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(colorForDifficulty(difficulty))
                             .font(.title2)
+                            .accessibilityIdentifier("\(difficulty.rawValue)Selected")
                     } else {
                         Image(systemName: "circle")
                             .foregroundColor(Theme.textSecondary)
@@ -54,6 +55,10 @@ struct DifficultyCard: View {
             .padding(20)
         }
         .buttonStyle(DifficultyCardStyle(difficulty: difficulty))
+        .accessibilityIdentifier(difficulty.rawValue)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(difficulty.rawValue) difficulty")
+        .accessibilityValue(isSelected ? "Selected" : "Not selected")
     }
     
     private func colorForDifficulty(_ difficulty: Difficulty) -> Color {

@@ -22,7 +22,7 @@ struct ContentView: View {
                 GameView()
                     .environmentObject(gameEngine)
             case .paused:
-                GameView() // Keep game view in background
+                GameView()
                     .environmentObject(gameEngine)
             case .gameOver:
                 GameOverView()

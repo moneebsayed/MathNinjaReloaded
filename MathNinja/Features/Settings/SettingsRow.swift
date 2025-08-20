@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Settings Row Component
 struct SettingsRow: View {
     let icon: String
     let title: String
@@ -17,7 +16,7 @@ struct SettingsRow: View {
         HStack {
             Image(systemName: icon)
                 .foregroundColor(Theme.primaryColor)
-                .frame(width: 24)
+                .frame(width: 30)
             
             Text(title)
                 .foregroundColor(Theme.textPrimary)
@@ -25,7 +24,13 @@ struct SettingsRow: View {
             Spacer()
             
             Toggle("", isOn: $isOn)
+                .labelsHidden()
                 .toggleStyle(SwitchToggleStyle(tint: Theme.primaryColor))
+                .accessibilityIdentifier("\(title.replacingOccurrences(of: " ", with: ""))Toggle")
         }
+        .accessibilityIdentifier("\(title.replacingOccurrences(of: " ", with: ""))Row")
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(title)
+        .accessibilityValue(isOn ? "On" : "Off")
     }
 }

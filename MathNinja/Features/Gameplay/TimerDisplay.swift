@@ -5,7 +5,6 @@
 //  Created by Moneeb Sayed on 8/16/25.
 //
 
-
 import SwiftUI
 
 struct TimerDisplay: View {
@@ -23,13 +22,20 @@ struct TimerDisplay: View {
             Image(systemName: "timer")
                 .foregroundColor(isWarning ? Theme.dangerColor : Theme.primaryColor)
                 .font(.caption)
+                .accessibilityIdentifier("TimerIcon")
             
             Text(formattedTime)
                 .font(.headline)
                 .fontWeight(.bold)
                 .foregroundColor(isWarning ? Theme.dangerColor : Theme.textPrimary)
+                .accessibilityIdentifier("TimerValue")
         }
         .scaleEffect(isWarning ? 1.1 : 1.0)
         .animation(.easeInOut(duration: 0.5).repeatCount(isWarning ? .max : 1), value: isWarning)
+        .accessibilityIdentifier("TimerDisplay")
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Time remaining: \(formattedTime)")
+        .accessibilityValue(isWarning ? "Warning: Low time" : "Normal")
+        .accessibilityHint(isWarning ? "Time is running out" : "Time remaining in the game")
     }
 }

@@ -5,6 +5,10 @@
 //  Created by Moneeb Sayed on 8/15/25.
 //
 
+//
+//  DifficultySelectionView.swift
+//  MathNinja
+//
 
 import SwiftUI
 
@@ -29,6 +33,9 @@ struct DifficultySelectionView: View {
                         }
                         .foregroundColor(Theme.primaryColor)
                     }
+                    .accessibilityIdentifier("BackButton")
+                    .accessibilityElement(children: .ignore) // Prevent inheritance
+                    
                     Spacer()
                 }
                 .padding(.horizontal, 24)
@@ -49,24 +56,25 @@ struct DifficultySelectionView: View {
                 }
                 .padding(.horizontal, 24)
                 
-                // Replace the "Start Game" button section with:
+                // Start Game button appears when difficulty is selected
                 if selectedDifficulty != nil {
                     Button("Start Game") {
-                        // Pass the selected difficulty to the game
                         if let difficulty = selectedDifficulty {
                             UserDefaults.standard.set(difficulty.rawValue, forKey: "selectedDifficulty")
                         }
                         gameStateManager.transition(to: .playing)
                     }
                     .buttonStyle(NinjaButtonStyle())
+                    .accessibilityIdentifier("StartSelectedGame")
+                    .accessibilityElement(children: .ignore) // Prevent inheritance
                     .transition(.scale.combined(with: .opacity))
                 }
-                
                 
                 Spacer()
             }
         }
         .animation(.easeInOut(duration: 0.3), value: selectedDifficulty)
+        .accessibilityIdentifier("DifficultySelectionView") // Move outside of ZStack
     }
 }
 

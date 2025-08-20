@@ -5,7 +5,6 @@
 //  Created by Moneeb Sayed on 8/16/25.
 //
 
-
 import SwiftUI
 
 struct PauseButton: View {
@@ -24,5 +23,8 @@ struct PauseButton: View {
                 )
         }
         .buttonStyle(PlainButtonStyle()) // This is crucial!
+        .accessibilityIdentifier("PauseButton")
+        .accessibilityLabel("Pause Game")
+        .accessibilityHint("Pause the current game")
     }
 }

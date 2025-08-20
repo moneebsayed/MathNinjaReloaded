@@ -27,6 +27,8 @@
 		A97A36772E4F8DDF002739A1 /* MathNinja.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MathNinja.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A97A36842E4F8DDF002739A1 /* MathNinjaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MathNinjaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A97A368E2E4F8DE0002739A1 /* MathNinjaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MathNinjaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A982C1BC2E5620B60018243D /* MathNinja.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = MathNinja.xctestplan; sourceTree = "<group>"; };
+		A9DE247E2E5620D2002D2D2F /* MathNinjaUITests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = MathNinjaUITests.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -99,6 +101,8 @@
 		A97A366E2E4F8DDF002739A1 = {
 			isa = PBXGroup;
 			children = (
+				A9DE247E2E5620D2002D2D2F /* MathNinjaUITests.xctestplan */,
+				A982C1BC2E5620B60018243D /* MathNinja.xctestplan */,
 				A97A36792E4F8DDF002739A1 /* MathNinja */,
 				A97A36872E4F8DDF002739A1 /* MathNinjaTests */,
 				A97A36912E4F8DE0002739A1 /* MathNinjaUITests */,
@@ -430,8 +434,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -458,8 +461,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

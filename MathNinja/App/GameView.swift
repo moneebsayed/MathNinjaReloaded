@@ -1,3 +1,8 @@
+//
+//  GameView.swift
+//  MathNinja
+//
+
 import SwiftUI
 import Combine
 import SpriteKit
@@ -18,10 +23,12 @@ struct GameView: View {
                 SpriteView(scene: scene)
                     .ignoresSafeArea()
                     .allowsHitTesting(!showingPauseMenu) // Disable when paused
+                    .accessibilityIdentifier("GameScene")
             } else {
                 Color.black.ignoresSafeArea()
                 Text("Loading Game Scene...")
                     .foregroundColor(.white)
+                    .accessibilityIdentifier("GameLoadingText")
             }
             
             // SwiftUI HUD Overlay - CRITICAL: Add proper layering
@@ -40,6 +47,7 @@ struct GameView: View {
                 }
                 .allowsHitTesting(true) // Enable HUD touches
                 .zIndex(100) // Ensure HUD is on top
+                .accessibilityIdentifier("GameHUD")
                 
                 Spacer()
                 
@@ -47,10 +55,12 @@ struct GameView: View {
                     StreakIndicator(streak: gameEngine.streak)
                         .transition(.scale.combined(with: .opacity))
                         .allowsHitTesting(false) // Don't block touches
+                        .accessibilityIdentifier("StreakIndicator")
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: gameEngine.streak)
         }
+        .accessibilityIdentifier("GameView")
         .onAppear {
             print("🎮 GameView appeared")
             setupGameScene()
@@ -71,6 +81,7 @@ struct GameView: View {
                     resumeGame()
                 }
             )
+            .accessibilityIdentifier("PauseMenuSheet")
         }
     }
     
