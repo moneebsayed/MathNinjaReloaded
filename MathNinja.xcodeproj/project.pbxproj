@@ -29,9 +29,33 @@
 		A97A368E2E4F8DE0002739A1 /* MathNinjaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MathNinjaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A982C1B72E5602760018243D /* Exceptions for "MathNinja" folder in "MathNinja" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Core/GameEngine+GameCenter.swift",
+			);
+			target = A97A36762E4F8DDF002739A1 /* MathNinja */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		A982C1B82E5602760018243D /* Exceptions for "MathNinja" folder in "Copy Bundle Resources" phase from "MathNinja" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = A97A36752E4F8DDF002739A1 /* Resources */;
+			membershipExceptions = (
+				"Core/GameEngine+GameCenter.swift",
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A97A36792E4F8DDF002739A1 /* MathNinja */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A982C1B72E5602760018243D /* Exceptions for "MathNinja" folder in "MathNinja" target */,
+				A982C1B82E5602760018243D /* Exceptions for "MathNinja" folder in "Copy Bundle Resources" phase from "MathNinja" target */,
+			);
 			path = MathNinja;
 			sourceTree = "<group>";
 		};
@@ -397,6 +421,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MathNinja/MathNinjaDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2UC73TESRT;
@@ -412,7 +437,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = moneeb.sayed.MathNinja.MathNinja;
+				PRODUCT_BUNDLE_IDENTIFIER = moneeb.sayed.MathNinja;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -458,7 +483,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = moneeb.sayed.MathNinja.MathNinjaTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moneebsayed.mathninja.MathNinjaTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -477,7 +502,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = moneeb.sayed.MathNinja.MathNinjaTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moneebsayed.mathninja.MathNinjaTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -494,7 +519,7 @@
 				DEVELOPMENT_TEAM = 2UC73TESRT;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = moneeb.sayed.MathNinja.MathNinjaUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moneebsayed.mathninja.MathNinjaUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -511,7 +536,7 @@
 				DEVELOPMENT_TEAM = 2UC73TESRT;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = moneeb.sayed.MathNinja.MathNinjaUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moneebsayed.mathninja.MathNinjaUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;

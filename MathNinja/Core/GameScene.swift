@@ -30,6 +30,14 @@ class GameScene: SKScene {
         setupScene()
         setupBackground()
         setupCharacters()
+        
+        // 🔄 Listen for character reset notifications
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleCharacterReset),
+            name: .resetCharacters,
+            object: nil
+        )
     }
     
     private func setupScene() {
@@ -68,6 +76,21 @@ class GameScene: SKScene {
         }
         
         print("🥷 Ninja at: \(ninjaPos) and 😈 Bad guy at: \(badGuyPos)")
+    }
+    
+    // 🔄 NEW: Reset characters to original positions
+    @objc private func handleCharacterReset() {
+        resetCharactersToOriginalPositions()
+    }
+    
+    func resetCharactersToOriginalPositions() {
+        print("🔄 Resetting characters to original positions")
+        
+        // Reset ninja to original position
+        ninjaCharacter?.returnToOriginalPosition()
+        
+        // Reset bad guy to original position
+        badGuyCharacter?.returnToOriginalPosition()
     }
     
     private func sliceFruitNode(_ fruitNode: FruitProblemNode) {
@@ -270,6 +293,11 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         super.update(currentTime)
         // Game update logic here
+    }
+    
+    // Don't forget to remove observer
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
 

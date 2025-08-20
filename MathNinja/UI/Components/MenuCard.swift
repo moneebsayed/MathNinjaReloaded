@@ -10,6 +10,7 @@ import SwiftUI
 // MARK: - Menu Card Container
 struct MenuCard<Content: View>: View {
     let content: Content
+    @Environment(\.colorScheme) var colorScheme
     
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
@@ -22,8 +23,14 @@ struct MenuCard<Content: View>: View {
         .padding(24)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Theme.cardBackground)
-                .stroke(Theme.primaryColor.opacity(0.3), lineWidth: 1)
+                .fill(Theme.adaptiveCardBackground)
+                .stroke(Theme.adaptivePrimaryColor.opacity(0.3), lineWidth: 1)
+                .shadow(
+                    color: colorScheme == .dark ? Color.black.opacity(0.5) : Color.gray.opacity(0.2),
+                    radius: colorScheme == .dark ? 8 : 4,
+                    x: 0,
+                    y: colorScheme == .dark ? 4 : 2
+                )
         )
     }
 }

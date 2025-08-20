@@ -5,7 +5,6 @@
 //  Created by Moneeb Sayed on 8/15/25.
 //
 
-
 import SwiftUI
 import SpriteKit
 
@@ -16,7 +15,16 @@ struct MenuView: View {
     var body: some View {
         ZStack {
             NinjaBackground()
-            
+
+            VStack {
+                Spacer()
+                SpriteView(scene: createChaseScene(), options: [.allowsTransparency])
+                    .frame(maxWidth: .infinity, maxHeight: 150)
+                    .ignoresSafeArea(.all)
+                    .allowsHitTesting(false)
+                    .background(.clear)
+            }
+
             VStack(spacing: 40) {
                 Spacer()
                 
@@ -44,12 +52,6 @@ struct MenuView: View {
                 }
                 
                 Spacer()
-                // Chase scene at the bottom
-                SpriteView(scene: createChaseScene())
-                    .frame(height: 150)
-                    .background(Color.clear) // Make sure this is clear
-                    .allowsHitTesting(false)
-                
                 // Version info
                 Text("Version 2.0")
                     .font(.caption)
@@ -64,13 +66,7 @@ struct MenuView: View {
     
     private func createChaseScene() -> ChaseSlashScene {
         let scene = ChaseSlashScene()
-        // Let the scene handle its own scale mode
+        scene.backgroundColor = .clear
         return scene
     }
 }
-
-#Preview {
-    MenuView()
-        .environmentObject(GameStateManager())
-}
-

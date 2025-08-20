@@ -53,9 +53,8 @@ class ChaseSlashScene: SKScene {
     }
     
     private func setupScene() {
-        backgroundColor = SKColor.clear // Changed from .clear to SKColor.clear for better transparency
         size = CGSize(width: UIScreen.main.bounds.width, height: 150)
-        
+        self.backgroundColor = .clear
         // Ensure the scene is truly transparent
         scaleMode = .aspectFit
     }

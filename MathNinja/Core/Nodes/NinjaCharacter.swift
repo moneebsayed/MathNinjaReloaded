@@ -303,4 +303,24 @@ class NinjaCharacter: SKNode {
     func setOriginalPosition(_ pos: CGPoint) {
         originalPosition = pos
     }
+    
+    // 🔄 NEW: Return to original position method
+    func returnToOriginalPosition() {
+        print("🥷 Ninja returning to original position: \(originalPosition)")
+        
+        // Stop any current actions
+        removeAllActions()
+        
+        // Animate back to original position
+        let moveAction = SKAction.move(to: originalPosition, duration: 0.5)
+        moveAction.timingMode = .easeOut
+        
+        // Also reset to idle animation
+        let resetAction = SKAction.run { [weak self] in
+            self?.startIdleAnimation()
+        }
+        
+        let sequence = SKAction.sequence([moveAction, resetAction])
+        run(sequence)
+    }
 }

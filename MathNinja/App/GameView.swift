@@ -4,7 +4,8 @@ import SpriteKit
 
 struct GameView: View {
     @EnvironmentObject var gameStateManager: GameStateManager
-    @StateObject private var gameEngine = GameEngine()
+    @EnvironmentObject var gameEngine: GameEngine
+    
     @State private var gameScene: GameScene?
     @State private var showingPauseMenu = false
     @State private var selectedDifficulty: Difficulty = .medium
@@ -12,16 +13,18 @@ struct GameView: View {
     
     var body: some View {
         ZStack {
+            // Game Scene Layer
             if let scene = gameScene {
                 SpriteView(scene: scene)
                     .ignoresSafeArea()
+                    .allowsHitTesting(!showingPauseMenu) // Disable when paused
             } else {
                 Color.black.ignoresSafeArea()
                 Text("Loading Game Scene...")
                     .foregroundColor(.white)
             }
             
-            // SwiftUI HUD Overlay
+            // SwiftUI HUD Overlay - CRITICAL: Add proper layering
             VStack {
                 // Top HUD
                 GameHUD(
@@ -32,14 +35,18 @@ struct GameView: View {
                     streak: gameEngine.streak,
                     difficulty: selectedDifficulty
                 ) {
+                    print("🎯 Pause button tapped!") // Debug print
                     pauseGame()
                 }
+                .allowsHitTesting(true) // Enable HUD touches
+                .zIndex(100) // Ensure HUD is on top
                 
                 Spacer()
                 
                 if gameEngine.streak >= 3 {
                     StreakIndicator(streak: gameEngine.streak)
                         .transition(.scale.combined(with: .opacity))
+                        .allowsHitTesting(false) // Don't block touches
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: gameEngine.streak)
@@ -49,14 +56,13 @@ struct GameView: View {
             setupGameScene()
             startGame()
             setupGameCallbacks()
-            setupPublisherSubscriptions() // Add this
+            setupPublisherSubscriptions()
         }
         .onDisappear {
             print("🎮 GameView disappeared")
-            cleanupSubscriptions() // Add this
-            gameEngine.endGame()
+            cleanupSubscriptions()
+            gameEngine.endGameWithGameCenter()
         }
-        // REMOVE the .onReceive - we'll handle it differently
         .sheet(isPresented: $showingPauseMenu) {
             PauseMenuView(
                 score: gameEngine.score,
@@ -68,12 +74,9 @@ struct GameView: View {
         }
     }
     
-    // Add this new method to handle subscriptions safely
     private func setupPublisherSubscriptions() {
-        // Clear any existing subscriptions first
         cancellables.removeAll()
         
-        // Subscribe to currentProblems changes safely
         gameEngine.$currentProblems
             .receive(on: DispatchQueue.main)
             .sink { [weak gameScene] problems in
@@ -83,7 +86,6 @@ struct GameView: View {
             .store(in: &cancellables)
     }
     
-    // Add this cleanup method
     private func cleanupSubscriptions() {
         cancellables.removeAll()
     }
@@ -103,7 +105,6 @@ struct GameView: View {
     }
 
     private func startGame() {
-        // Get difficulty from UserDefaults or use medium as default
         if let difficultyString = UserDefaults.standard.object(forKey: "selectedDifficulty") as? String,
            let difficulty = Difficulty(rawValue: difficultyString) {
             selectedDifficulty = difficulty
@@ -111,37 +112,38 @@ struct GameView: View {
             selectedDifficulty = .medium
         }
         
-        gameEngine.startGame(difficulty: selectedDifficulty)
+        gameEngine.startGameWithGameCenter(difficulty: selectedDifficulty)
     }
     
     private func pauseGame() {
+        print("⏸️ Pausing game...") // Debug print
         gameEngine.pauseGame()
         gameScene?.setGamePaused(true)
         showingPauseMenu = true
     }
 
     private func resumeGame() {
+        print("▶️ Resuming game...") // Debug print
         showingPauseMenu = false
         gameScene?.setGamePaused(false)
         gameEngine.resumeGame()
     }
     
     private func setupGameCallbacks() {
-        // Use weak references to prevent retain cycles
         gameEngine.onGameOver = { [weak gameStateManager] in
             DispatchQueue.main.async {
-                gameStateManager?.transition(to: .gameOver)
+                if gameStateManager?.currentState != .menu {
+                    gameStateManager?.transition(to: .gameOver)
+                }
             }
         }
         
         gameEngine.onCorrectAnswer = {
-            // Add haptic feedback
             let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
             impactFeedback.impactOccurred()
         }
         
         gameEngine.onWrongAnswer = {
-            // Add haptic feedback for wrong answer
             let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
             impactFeedback.impactOccurred()
         }

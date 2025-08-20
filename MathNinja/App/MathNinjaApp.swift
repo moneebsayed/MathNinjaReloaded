@@ -15,7 +15,6 @@ struct MathNinjaApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(gameStateManager)
-                .preferredColorScheme(.dark) // Ninja theme!
         }
     }
 }

@@ -20,41 +20,49 @@ struct GameHUD: View {
     @State private var timeWarning = false
     
     var body: some View {
-        HStack(alignment: .top) {
-            // Left side - Score and Streak
-            VStack(alignment: .leading) {
-                ScoreDisplay(score: score)
-                if streak > 0 {
-                    StreakDisplay(streak: streak)
+        ZStack(alignment: .top) {
+            HStack(alignment: .top) {
+                // Left side - Score and Streak
+                VStack(alignment: .leading) {
+                    ScoreDisplay(score: score)
+                    Spacer()
+                        .frame(height: 50)
+                    if streak > 0 {
+                        StreakDisplay(streak: streak)
+                    }
+                }
+                
+                Spacer()
+                
+                // Right side - Timer and Lives
+                VStack(alignment: .trailing, spacing: 4) {
+                    TimerDisplay(
+                        timeRemaining: timeRemaining,
+                        isWarning: timeWarning
+                    )
+                    Spacer()
+                        .frame(height: 50)
+                    LivesIndicator(lives: lives, maxLives: maxLives)
                 }
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical)
+            .onChange(of: timeRemaining) { _, newTime in
+                timeWarning = newTime <= 10
+            }
             
-            Spacer()
-            
-            // Center - Difficulty indicator
+            // Center - Difficulty and Pause (FIXED POSITIONING)
             VStack {
                 DifficultyBadge(difficulty: difficulty)
                 
+                // CRITICAL: Add explicit frame and allowsHitTesting
                 PauseButton(action: onPause)
-                    .padding()
-            }
-            
-            Spacer()
-            
-            // Right side - Timer and Pause
-            VStack(alignment: .trailing, spacing: 4) {
-                TimerDisplay(
-                    timeRemaining: timeRemaining,
-                    isWarning: timeWarning
-                )
-                LivesIndicator(lives: lives, maxLives: maxLives)
+                    .frame(width: 60, height: 60) // Larger touch area
+                    .allowsHitTesting(true) // Ensure button can receive touches
+                    .zIndex(999) // Bring to front
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical)
-        .onChange(of: timeRemaining) { _, newTime in
-            timeWarning = newTime <= 10
-        }
+        .allowsHitTesting(true) // Enable touch for entire HUD
     }
 }
 

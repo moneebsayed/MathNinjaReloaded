@@ -36,16 +36,16 @@ enum Difficulty: String, CaseIterable, Identifiable {
     
     var numberOfLives: Int {
         switch self {
-        case .easy: return 5
-        case .medium: return 3
+        case .easy: return 3
+        case .medium: return 2
         case .hard: return 1
         }
     }
     
     var maxLives: Int {
         switch self {
-        case .easy: return 5
-        case .medium: return 3
+        case .easy: return 3
+        case .medium: return 2
         case .hard: return 1
         }
     }
