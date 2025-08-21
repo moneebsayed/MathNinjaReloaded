@@ -137,7 +137,6 @@ final class MathNinjaUITests: XCTestCase {
         easyCard.tap()
         
         let startSelectedButton = app.buttons["StartSelectedGame"]
-        startSelectedButton.waitForExistence(timeout: 3)
         startSelectedButton.tap()
         
         let gameView = app.otherElements["GameView"]

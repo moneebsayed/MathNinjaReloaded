@@ -330,7 +330,7 @@ class FruitProblemNode: SKNode {
         
         removeAction(forKey: "autoSelect")
         
-        let isCorrect = selectedAnswer == problem.correctAnswer
+        _ = selectedAnswer == problem.correctAnswer
         print("🎯 Selected: \(selectedAnswer), Correct: \(problem.correctAnswer)")
         
         // Remove answer stars with animation

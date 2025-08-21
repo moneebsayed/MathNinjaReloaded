@@ -35,29 +35,17 @@
 		A982C1B72E5602760018243D /* Exceptions for "MathNinja" folder in "MathNinja" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Core/GameEngine+GameCenter.swift",
 				Info.plist,
 			);
 			target = A97A36762E4F8DDF002739A1 /* MathNinja */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		A982C1B82E5602760018243D /* Exceptions for "MathNinja" folder in "Copy Bundle Resources" phase from "MathNinja" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = A97A36752E4F8DDF002739A1 /* Resources */;
-			membershipExceptions = (
-				"Core/GameEngine+GameCenter.swift",
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A97A36792E4F8DDF002739A1 /* MathNinja */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A982C1B72E5602760018243D /* Exceptions for "MathNinja" folder in "MathNinja" target */,
-				A982C1B82E5602760018243D /* Exceptions for "MathNinja" folder in "Copy Bundle Resources" phase from "MathNinja" target */,
 			);
 			path = MathNinja;
 			sourceTree = "<group>";

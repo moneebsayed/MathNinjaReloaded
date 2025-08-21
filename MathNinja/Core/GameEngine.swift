@@ -402,7 +402,7 @@ class GameEngine: ObservableObject {
         guard isGameCenterAuthenticated else { return }
         
         // Correct usage with required handler parameter
-        GKAccessPoint.shared.trigger { [weak self] in
+        GKAccessPoint.shared.trigger {
             print("🎮 Game Center dashboard presented")
             // Handle any post-presentation logic if needed
         }
@@ -412,7 +412,7 @@ class GameEngine: ObservableObject {
     func showGameCenterLeaderboards() {
         guard isGameCenterAuthenticated else { return }
         
-        GKAccessPoint.shared.trigger(state: .leaderboards) { [weak self] in
+        GKAccessPoint.shared.trigger(state: .leaderboards) {
             print("🏆 Game Center leaderboards presented")
         }
     }
@@ -420,7 +420,7 @@ class GameEngine: ObservableObject {
     func showGameCenterAchievements() {
         guard isGameCenterAuthenticated else { return }
         
-        GKAccessPoint.shared.trigger(state: .achievements) { [weak self] in
+        GKAccessPoint.shared.trigger(state: .achievements) {
             print("🏅 Game Center achievements presented")
         }
     }
