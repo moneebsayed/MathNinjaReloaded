@@ -62,8 +62,8 @@
             filePath = "MathNinjaUITests/MathNinjaUITests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "319"
-            endingLineNumber = "319"
+            startingLineNumber = "330"
+            endingLineNumber = "330"
             landmarkName = "startEasyGame()"
             landmarkType = "7">
          </BreakpointContent>

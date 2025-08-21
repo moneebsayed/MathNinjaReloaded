@@ -144,6 +144,17 @@ final class MathNinjaUITests: XCTestCase {
         XCTAssertTrue(gameView.waitForExistence(timeout: 20), "Game view should appear after starting game")
     }
     
+    func testGameLaunchFromDifficultyMediumSelection() throws {
+        let app = XCUIApplication()
+        app.activate()
+        app/*@START_MENU_TOKEN@*/.buttons["StartGame"]/*[[".otherElements",".buttons[\"Start Game\"]",".buttons[\"StartGame\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app/*@START_MENU_TOKEN@*/.buttons["🟡, Medium, Numbers 11-20, 60s, circle"]/*[[".buttons",".containing(.button, identifier: \"Medium\").firstMatch",".matching(identifier: \"Medium\").containing(.button, identifier: \"🟡\").firstMatch",".containing(.button, identifier: \"🟡\").firstMatch",".otherElements.buttons[\"🟡, Medium, Numbers 11-20, 60s, circle\"]",".otherElements[\"Medium difficulty\"].buttons[\"Medium\"]",".buttons[\"🟡, Medium, Numbers 11-20, 60s, circle\"]"],[[[-1,6],[-1,5],[-1,4],[-1,0,1]],[[-1,3],[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app/*@START_MENU_TOKEN@*/.buttons["StartSelectedGame"]/*[[".otherElements",".buttons[\"Start Game\"]",".buttons[\"StartSelectedGame\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        
+        let gameView = app.otherElements["GameView"]
+        XCTAssertTrue(gameView.waitForExistence(timeout: 20), "Game view should appear after starting game")
+    }
+    
     func testBackButtonFromDifficultySelection() throws {
         navigateToDifficultySelection()
         
