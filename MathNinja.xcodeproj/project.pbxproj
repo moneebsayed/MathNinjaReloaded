@@ -36,6 +36,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Core/GameEngine+GameCenter.swift",
+				Info.plist,
 			);
 			target = A97A36762E4F8DDF002739A1 /* MathNinja */;
 		};
@@ -431,7 +432,9 @@
 				DEVELOPMENT_TEAM = 2UC73TESRT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MathNinja/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Multiply Ninja";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -461,7 +464,9 @@
 				DEVELOPMENT_TEAM = 2UC73TESRT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MathNinja/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Multiply Ninja";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
