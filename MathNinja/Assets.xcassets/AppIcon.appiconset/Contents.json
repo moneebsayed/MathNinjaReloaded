@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "AppIcon-iOS-Default-1024x1024@1x.jpg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -23,6 +24,7 @@
           "value" : "tinted"
         }
       ],
+      "filename" : "AppIcon-iOS-TintedDark-1024x1024@1x.jpg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
